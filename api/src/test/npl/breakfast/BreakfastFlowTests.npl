@@ -1,0 +1,187 @@
+package breakfast
+
+function participantOf(email: Text) returns Party -> {
+    return partyOf(
+        mapOf(
+            Pair("email", setOf(email)),
+            Pair("iss", setOf("http://localhost:11000")) // "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast")) // TODO add issuer
+        )
+    );
+}
+
+/**
+ * End-to-end flow test: Complete breakfast registration lifecycle
+ */
+@test
+function test_complete_breakfast_flow(test: Test) -> {
+    // Step 1: Create participant protocols for team members
+    var aliceParty = participantOf("alice@company.com");
+    var bobParty = participantOf("bob@company.com");
+    var carolParty = participantOf("carol@company.com");
+    var daveParty = participantOf("dave@company.com");
+
+    var alice = Participant[aliceParty](name = "Alice Smith");
+    var bob = Participant[bobParty](name = "Bob Jones");
+    var carol = Participant[carolParty](name = "Carol White");
+    var dave = Participant[daveParty](name = "Dave Brown");
+    
+    // Step 2: Create a breakfast event for 5 people
+    var breakfast = BreakfastEvent[aliceParty](
+        eventDate = localDateOf(2026, 1, 20),
+        maxParticipants = 3
+    );
+
+    // Verify initial state
+    test.assertEquals(BreakfastEvent.States.open, breakfast.activeState().getOrFail(), "Event should start in open state");
+    test.assertEquals(0, breakfast.getRegistrationCount[aliceParty](), "Should start with no registrations");
+
+    // Step 3: Register participants
+    breakfast.registerAsParticipant[aliceParty](alice);
+    test.assertEquals(1, breakfast.getRegistrationCount[aliceParty](), "Should have 1 registration");
+    test.assertEquals(BreakfastEvent.States.open, breakfast.activeState().getOrFail(), "Should still be open");
+
+    breakfast.registerAsParticipant[bobParty](bob);
+    test.assertEquals(2, breakfast.getRegistrationCount[bobParty](), "Should have 2 registrations");
+    test.assertEquals(BreakfastEvent.States.open, breakfast.activeState().getOrFail(), "Should still be open");
+    breakfast.registerAsParticipant[carolParty](carol);
+    test.assertEquals(3, breakfast.getRegistrationCount[carolParty](), "Should have 3 registrations");
+    test.assertEquals(BreakfastEvent.States.full, breakfast.activeState().getOrFail(), "Should transition to full state");
+
+    // Step 4: Try to register when full (should fail)
+    test.assertFails(
+        function() -> breakfast.registerAsParticipant[daveParty](dave),
+        "Should not allow registration when full"
+    );
+
+    // Step 5: Get all registrations
+    var allRegistrations = breakfast.getRegistrations['organizer@company.com']();
+    test.assertEquals(3, allRegistrations.size(), "Should have 3 registrations");
+    test.assertEquals("Alice Smith", allRegistrations.get(0).participant.name, "First participant should be Alice");
+    test.assertEquals("Bob Jones", allRegistrations.get(1).participant.name, "Second participant should be Bob");
+    test.assertEquals("Carol White", allRegistrations.get(2).participant.name, "Third participant should be Carol");
+
+    // Step 6: Unregister a participant
+    breakfast.unregister['organizer@company.com'](bob);
+    test.assertEquals(2, breakfast.getRegistrationCount['organizer@company.com'](), "Should have 2 registrations after unregister");
+    test.assertEquals(BreakfastEvent.States.open, breakfast.activeState().getOrFail(), "Should transition back to open state");
+
+    // Step 7: Register another participant in the freed spot
+    breakfast.register['organizer@company.com'](dave);
+    test.assertEquals(3, breakfast.getRegistrationCount['organizer@company.com'](), "Should have 3 registrations again");
+    test.assertEquals(BreakfastEvent.States.full, breakfast.activeState().getOrFail(), "Should be full again");
+
+    // Step 8: Update max participants to increase capacity
+    breakfast.updateMaxParticipants['organizer@company.com'](5);
+    test.assertEquals(BreakfastEvent.States.open, breakfast.activeState().getOrFail(), "Should transition to open with increased capacity");
+    // Step 9: Register more participants
+    breakfast.register['organizer@company.com'](bob);
+    test.assertEquals(4, breakfast.getRegistrationCount['organizer@company.com'](), "Should have 4 registrations");
+
+    // Step 10: Complete the event
+    breakfast.complete['organizer@company.com']();
+    test.assertEquals(BreakfastEvent.States.completed, breakfast.activeState().getOrFail(), "Event should be completed");
+
+    // Step 11: Verify final registrations are still accessible
+    var finalRegistrations = breakfast.getRegistrations['organizer@company.com']();
+    test.assertEquals(4, finalRegistrations.size(), "Should still have 4 registrations after completion");
+};
+
+/**
+ * Test participant update functionality
+ */
+@test
+function test_participant_updates(test: Test) -> {
+    // Create a participant
+    var participant = Participant['john@company.com'](name = "John Doe");
+
+    test.assertEquals("John Doe", participant.name, "Initial name should be John Doe");
+
+    // Update name
+    participant.updateName['john@company.com']("John Smith");
+    test.assertEquals("John Smith", participant.name, "Name should be updated to John Smith");
+
+    // Try to set empty name (should fail)
+    test.assertFails(
+        function() -> participant.updateName['john@company.com'](""),
+        "Should not allow empty name"
+    );
+};
+
+/**
+ * Test event cancellation flow
+ */
+@test
+function test_event_cancellation(test: Test) -> {
+    var alice = Participant['alice@company.com'](name = "Alice");
+    var bob = Participant['bob@company.com'](name = "Bob");
+
+    var breakfast = BreakfastEvent['organizer@company.com'](
+        eventDate = localDateOf(2026, 1, 25),
+        maxParticipants = 10
+    );
+
+    breakfast.register['organizer@company.com'](alice);
+    breakfast.register['organizer@company.com'](bob);
+
+    test.assertEquals(2, breakfast.getRegistrationCount['organizer@company.com'](), "Should have 2 registrations");
+
+    // Cancel the event
+    breakfast.cancel['organizer@company.com']();
+    test.assertEquals(BreakfastEvent.States.cancelled, breakfast.activeState().getOrFail(), "Event should be cancelled");
+};
+
+/**
+ * Test capacity management
+ */
+@test
+function test_capacity_management(test: Test) -> {
+    var alice = Participant['alice@company.com'](name = "Alice");
+    var bob = Participant['bob@company.com'](name = "Bob");
+    var carol = Participant['carol@company.com'](name = "Carol");
+
+    var breakfast = BreakfastEvent['organizer@company.com'](
+        eventDate = localDateOf(2026, 1, 30),
+        maxParticipants = 5
+    );
+
+    breakfast.register['organizer@company.com'](alice);
+    breakfast.register['organizer@company.com'](bob);
+
+    // Try to reduce capacity below current registrations (should fail)
+    test.assertFails(
+        function() -> breakfast.updateMaxParticipants['organizer@company.com'](1),
+        "Should not allow reducing capacity below current registrations"
+    );
+
+    // Reduce capacity to match current registrations
+    breakfast.updateMaxParticipants['organizer@company.com'](2);
+    test.assertEquals(BreakfastEvent.States.full, breakfast.activeState().getOrFail(), "Should be full when capacity equals registrations");
+
+    // Try to register another participant (should fail)
+    test.assertFails(
+        function() -> breakfast.register['organizer@company.com'](carol),
+        "Should not allow registration when at capacity"
+    );
+};
+
+/**
+ * Test unregistering non-existent participant
+ */
+@test
+function test_unregister_non_existent(test: Test) -> {
+    var alice = Participant['alice@company.com'](name = "Alice");
+    var bob = Participant['bob@company.com'](name = "Bob");
+
+    var breakfast = BreakfastEvent['organizer@company.com'](
+        eventDate = localDateOf(2026, 2, 1),
+        maxParticipants = 10
+    );
+
+    breakfast.register['organizer@company.com'](alice);
+
+    // Try to unregister someone who never registered
+    test.assertFails(
+        function() -> breakfast.unregister['organizer@company.com'](bob),
+        "Should fail when trying to unregister non-existent participant"
+    );
+};

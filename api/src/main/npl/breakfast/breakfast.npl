@@ -1,0 +1,176 @@
+package breakfast
+
+/**
+ * Participant protocol representing a team member
+ * @param participant The party representing this participant
+ * @param name The name of the participant
+ */
+@api
+// Paricipant claims: email, iss
+protocol[participant] Participant(
+    var name: Text
+) {
+    require(name.length() > 0, "Name cannot be empty");
+
+    /**
+     * Update the participant's name
+     * @param newName The new name
+     */
+    @api
+    permission[participant] updateName(newName: Text) {
+        require(newName.length() > 0, "Name cannot be empty");
+        name = newName;
+    };
+    
+    @api
+    permission[participant] registerForEvent(event: BreakfastEvent) {
+        event.registerAsParticipant[participant](this);
+    };
+};
+
+/**
+ * Represents a breakfast registration entry
+ * @param participant The participant who registered
+ * @param registeredAt The timestamp when registration occurred
+ */
+struct Registration {
+    participant: Participant,
+    registeredAt: DateTime
+};
+
+/**
+ * Breakfast event protocol for team breakfast registration
+ * @param organizer The party organizing the breakfast event
+ * @param eventDate The date of the breakfast event
+ * @param maxParticipants The maximum number of participants allowed
+ */
+@api
+protocol[organizer] BreakfastEvent(
+    var eventDate: LocalDate,
+    var maxParticipants: Number
+) {
+    require(maxParticipants > 0, "Maximum participants must be positive");
+
+    initial state open;
+    state full;
+    final state completed;
+    final state cancelled;
+
+    private var registrations = listOf<Registration>();
+
+    init {
+        this.observers = mapOf(
+            Pair("everyone", partyOf(
+                mapOf(
+                    Pair("iss", setOf("http://localhost:11000"))
+                )
+            ))
+        );
+        info(this.observers);
+    }
+
+    /**
+     * Get the current number of registrations
+     * @return The number of participants registered
+     */
+    function registrationCount() returns Number -> registrations.size();
+
+    /**
+     * Check if event is at capacity
+     * @return True if the event is full
+     */
+    function isFull() returns Boolean -> registrationCount() >= maxParticipants;
+
+    /**
+     * Register a participant for the breakfast event
+     * @param participant The participant protocol instance to register
+     */
+    @api
+    permission[organizer] register(participant: Participant) | open {
+        require(!isFull(), "Event is at maximum capacity");
+
+        var registration = Registration(
+            participant = participant,
+            registeredAt = now()
+        );
+
+        registrations = registrations.with(registration);
+
+        if (isFull()) {
+            become full;
+        };
+    };
+
+    permission[*participant] registerAsParticipant(participantProtocol: Participant) | open {
+        this.register[organizer](participantProtocol);
+    };
+
+    /**
+     * Remove a participant registration
+     * @param participant The participant protocol instance to remove
+     */
+    @api
+    permission[organizer] unregister(participant: Participant) | open, full {
+        var matchingReg = registrations.filter(function(r: Registration) -> r.participant == participant).firstOrNone();
+        
+        require(matchingReg.isPresent(), "No registration found for this participant");
+
+        registrations = registrations.without(matchingReg.getOrFail());
+
+        if (activeState().getOrFail() == States.full && !isFull()) {
+            become open;
+        };
+    };
+
+    /**
+     * Mark the event as completed
+     */
+    @api
+    permission[organizer] complete() | open, full {
+        become completed;
+    };
+
+    /**
+     * Cancel the breakfast event
+     */
+    @api
+    permission[organizer] cancel() | open, full {
+        become cancelled;
+    };
+
+    /**
+     * Get all registered participants
+     * @return List of all registrations
+     */
+    @api
+    permission[organizer] getRegistrations() returns List<Registration> | open, full, completed {
+        return registrations;
+    };
+
+    /**
+     * Get the number of registered participants
+     * @return The count of registrations
+     */
+    @api
+    permission[organizer] getRegistrationCount() returns Number | open, full, completed {
+        return registrationCount();
+    };
+
+    /**
+     * Update the maximum number of participants
+     * @param newMax The new maximum number of participants
+     */
+    @api
+    permission[organizer] updateMaxParticipants(newMax: Number) | open, full {
+        require(newMax > 0, "Maximum participants must be positive");
+        require(newMax >= registrationCount(), "Cannot set max below current registrations");
+
+        maxParticipants = newMax;
+
+        if (isFull() && activeState().getOrFail() == States.open) {
+            become full;
+        } else if (!isFull() && activeState().getOrFail() == States.full) {
+            become open;
+        };
+    };
+};

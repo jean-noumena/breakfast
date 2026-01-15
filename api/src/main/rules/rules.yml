@@ -1,0 +1,27 @@
+document.Document:
+  editor:
+    extract:
+      claims:
+        - preferred_username
+
+breakfast.Participant:
+  everyone:
+    set:
+      claims:
+        iss:
+          - "http://localhost:11000" # "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast" # TODO add issuer
+  participant:
+    extract:
+      claims:
+        - email
+
+breakfast.BreakfastEvent:
+  everyone:
+    set:
+      claims:
+        iss:
+          - "http://localhost:11000" # "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast" # TODO add issuer
+  organizer:
+    extract:
+      claims:
+        - email
