@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import Shell from './components/Shell.tsx'
 import { HomePage } from './components/HomePage.tsx'
+import { BreakfastPage } from './components/BreakfastPage.tsx'
 
 export const router = () => {
     return createBrowserRouter([
@@ -10,6 +11,10 @@ export const router = () => {
                 {
                     path: '/home',
                     element: <HomePage />
+                },
+                {
+                    path: '/breakfast',
+                    element: <BreakfastPage />
                 },
                 {
                     path: '*',

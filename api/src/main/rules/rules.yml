@@ -16,11 +16,11 @@ breakfast.Participant:
         - email
 
 breakfast.BreakfastEvent:
-  everyone:
-    set:
-      claims:
-        iss:
-          - "http://localhost:11000" # "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast" # TODO add issuer
+  # everyone:
+  #   set:
+  #     claims:
+  #       iss:
+  #         - "http://localhost:11000" # "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast" # TODO add issuer
   organizer:
     extract:
       claims:

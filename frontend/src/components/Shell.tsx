@@ -60,14 +60,18 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-end'
 }))
 
-type MenuLabel = 'Home'
+type MenuLabel = 'Home' | 'Breakfast'
 
 interface MenuItem {
     label: MenuLabel
     icon: SvgIconComponent
 }
 
-const allMenuItems: MenuItem[] = [{ label: 'Home', icon: HomeIcon }]
+import RestaurantIcon from '@mui/icons-material/Restaurant'
+const allMenuItems: MenuItem[] = [
+    { label: 'Home', icon: HomeIcon },
+    { label: 'Breakfast', icon: RestaurantIcon }
+]
 
 export default function Shell() {
     const navigate = useNavigate()
