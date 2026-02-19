@@ -1,31 +1,28 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import './index.css'
-import { CssBaseline } from '@mui/material'
-import { RouterProvider } from 'react-router-dom'
-import { AuthProvider } from './AuthProvider.tsx'
-import { RuntimeConfigurationProvider } from './RuntimeConfigurationProvider.tsx'
-import { ServiceProvider } from './ServiceProvider.tsx'
-import { UserProvider } from './UserProvider.tsx'
-import { router } from './Router.tsx'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PasswordAuthProvider } from './auth';
+import './index.css';
+import App from './App.tsx';
+import '@npl/frontend/styles.css';
 
-export const IouApp = () => {
-    return (
-        <React.StrictMode>
-            <CssBaseline></CssBaseline>
-            <RouterProvider router={router()} />
-        </React.StrictMode>
-    )
-}
+// Create a React Query client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-    <RuntimeConfigurationProvider>
-        <AuthProvider>
-            <ServiceProvider>
-                <UserProvider>
-                    <IouApp></IouApp>
-                </UserProvider>
-            </ServiceProvider>
-        </AuthProvider>
-    </RuntimeConfigurationProvider>
-)
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <PasswordAuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </PasswordAuthProvider>
+  </StrictMode>,
+);

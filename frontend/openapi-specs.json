@@ -1,0 +1,19 @@
+{
+  "specs": [
+    {
+      "key": "breakfast",
+      "file": "breakfast-openapi.yml",
+      "targetDir": "breakfast",
+      "apiPath": "./src/gen/api/breakfast",
+      "zodPath": "./src/gen/zod/breakfast.ts"
+    },
+    {
+      "key": "document",
+      "file": "document-openapi.yml",
+      "targetDir": "document",
+      "apiPath": "./src/gen/api/document",
+      "zodPath": "./src/gen/zod/document.ts"
+    }
+  ],
+  "generatedAt": "2026-02-18T16:10:54.802Z"
+}
