@@ -5,20 +5,23 @@
  */
 
 import React from 'react';
-import { usePasswordAuth } from '@npl/frontend';
+import { useAuth } from 'react-oidc-context';
 import './UserMenu.css';
 
 export const UserMenu: React.FC = () => {
-  const { logout, isAuthenticated } = usePasswordAuth();
+  const auth = useAuth();
 
-  if (!isAuthenticated) {
+  if (!auth.isAuthenticated) {
     return null;
   }
 
   return (
     <div className="user-menu">
+      {auth.user?.profile?.name && (
+        <span className="user-name">{auth.user.profile.name}</span>
+      )}
       <button 
-        onClick={logout}
+        onClick={() => auth.signoutRedirect()}
         className="logout-button"
         title="Logout"
       >

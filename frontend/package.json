@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "old-discover": "node node_modules/@npl/frontend/lib/scripts/discover-openapi.js",
+    "old-discover": "node node_modules/@npl/frontend/lib/scripts/discover-openapi.js --specDir=openapi",
     "old-generate": "node node_modules/@npl/frontend/lib/scripts/generate-all.js",
     "discover": "node scripts/discover.js",
     "generate": "node scripts/generate.js"

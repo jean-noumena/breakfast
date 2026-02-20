@@ -18,4 +18,5 @@ cli
 openapi
 clients
 copilot-instructions.md
-gen
+frontend/src/gen
+frontend/dist

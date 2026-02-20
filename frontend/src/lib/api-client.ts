@@ -5,23 +5,37 @@
  * This thin wrapper allows Orval to find the mutator while keeping
  * the actual implementation in the library.
  * 
- * Also injects Bearer token authentication for password-based auth.
+ * Also injects Bearer token authentication for OIDC.
  */
-import { customInstance as libCustomInstance, axiosInstance as libAxiosInstance, createAuthService } from '@npl/frontend';
+import { customInstance as libCustomInstance, axiosInstance as libAxiosInstance } from '@npl/frontend';
 import type { AxiosRequestConfig } from 'axios';
 
-// Create auth service instance
-const authService = createAuthService({
-  authority: import.meta.env.VITE_OIDC_AUTHORITY || '',
-  clientId: import.meta.env.VITE_OIDC_CLIENT_ID || 'breakfast-app',
-});
+// Helper to get OIDC user from session storage
+const getOidcUser = () => {
+  try {
+    // react-oidc-context stores user data with this key pattern
+    const oidcKey = Object.keys(sessionStorage).find(key => 
+      key.startsWith('oidc.user:') || key.includes('oidc.user')
+    );
+    
+    if (oidcKey) {
+      const userData = sessionStorage.getItem(oidcKey);
+      if (userData) {
+        return JSON.parse(userData);
+      }
+    }
+  } catch (error) {
+    console.error('Error getting OIDC user:', error);
+  }
+  return null;
+};
 
-// Add request interceptor to inject Bearer token
+// Add request interceptor to inject Bearer token from OIDC
 libAxiosInstance.interceptors.request.use(
   (config) => {
-    const token = authService.getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const user = getOidcUser();
+    if (user?.access_token) {
+      config.headers.Authorization = `Bearer ${user.access_token}`;
     }
     return config;
   },
@@ -30,32 +44,14 @@ libAxiosInstance.interceptors.request.use(
   }
 );
 
-// Add response interceptor to handle 401 errors and token refresh
+// Add response interceptor to handle 401 errors
 libAxiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-
-    // If 401 and we haven't retried yet, try to refresh token
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        await authService.refreshToken();
-        const token = authService.getAccessToken();
-        
-        if (token) {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return libAxiosInstance(originalRequest);
-        }
-      } catch (refreshError) {
-        // Refresh failed, logout user
-        authService.logout();
-        window.location.reload();
-        return Promise.reject(refreshError);
-      }
+    if (error.response?.status === 401) {
+      // Token expired or invalid, redirect to login
+      window.location.href = '/';
     }
-
     return Promise.reject(error);
   }
 );

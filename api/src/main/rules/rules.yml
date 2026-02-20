@@ -7,7 +7,7 @@ breakfast.Participant:
   participant:
     extract:
       claims:
-        - email
+        - preferred_username
 
 breakfast.BreakfastEvent:
   everyone:
@@ -18,4 +18,4 @@ breakfast.BreakfastEvent:
   organizer:
     extract:
       claims:
-        - email
+        - preferred_username

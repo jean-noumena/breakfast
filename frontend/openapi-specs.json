@@ -1,12 +1,4 @@
 {
-  "specs": [
-    {
-      "key": "breakfast",
-      "file": "openapi/breakfast-openapi.yml",
-      "targetDir": "breakfast",
-      "apiPath": "./src/gen/api/breakfast",
-      "zodPath": "./src/gen/zod/breakfast.ts"
-    }
-  ],
-  "generatedAt": "2026-02-20T09:01:26.612Z"
+  "specs": [],
+  "generatedAt": "2026-02-20T10:09:07.788Z"
 }
