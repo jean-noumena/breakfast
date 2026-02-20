@@ -1,0 +1,29 @@
+package breakfast;
+
+ /**
+ * Participant protocol representing a team member
+ * @param participant The party representing this participant
+ * @param name The name of the participant
+ */
+@api
+    // Paricipant claims: email, iss
+protocol[participant, everyone] Participant(
+    var name: Text
+) {
+    require(name.length() > 0, "Name cannot be empty");
+
+    /**
+     * Update the participant's name
+     * @param newName The new name
+     */
+    @api
+    permission[participant] updateName(newName: Text) {
+        require(newName.length() > 0, "Name cannot be empty");
+        name = newName;
+    };
+
+    @api
+    permission[participant] registerForEvent(event: BreakfastEvent) {
+        event.registerAsParticipant[participant](this);
+    };
+};

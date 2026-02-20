@@ -7,9 +7,14 @@
  * 
  * Also injects Bearer token authentication for password-based auth.
  */
-import { customInstance as libCustomInstance, axiosInstance as libAxiosInstance } from '@npl/frontend';
+import { customInstance as libCustomInstance, axiosInstance as libAxiosInstance, createAuthService } from '@npl/frontend';
 import type { AxiosRequestConfig } from 'axios';
-import { authService } from '@/auth';
+
+// Create auth service instance
+const authService = createAuthService({
+  authority: import.meta.env.VITE_OIDC_AUTHORITY || '',
+  clientId: import.meta.env.VITE_OIDC_CLIENT_ID || 'breakfast-app',
+});
 
 // Add request interceptor to inject Bearer token
 libAxiosInstance.interceptors.request.use(

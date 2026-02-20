@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { usePasswordAuth } from '../auth/PasswordAuthContext';
+import { usePasswordAuth } from '@npl/frontend';
 import './UserMenu.css';
 
 export const UserMenu: React.FC = () => {

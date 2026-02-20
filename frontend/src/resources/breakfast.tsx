@@ -105,7 +105,7 @@ export const BreakfastResource: ResourceDefinition<
 
   // Reference configuration
   referenceKey: 'BreakfastEvent',
-  formatLabel: (doc) => doc.eventDate.substring(0, 50) + (doc.content.length > 50 ? '...' : ''),
+  formatLabel: (doc) => doc.eventDate.substring(0, 50),
 
   // Generated React Query hooks
   listHook: useGetBreakfastEventList,
@@ -119,8 +119,14 @@ export const BreakfastResource: ResourceDefinition<
   // SmartTable will filter these based on entity['@actions']
   actions: [registerAction, getRegistrationsAction],
 
+  party: {
+    organizer: {
+      requiredClaimKeys: ["preferred_username"],
+      additionalClaimKeysAllowed: true,
+    },
+  },
+
   // Table column configuration
-  // Note: Render functions will be implemented in Phase 4 with actual components
   columns: [
     {
       key: 'id',
@@ -129,11 +135,13 @@ export const BreakfastResource: ResourceDefinition<
       width: '280px',
     },
     {
-      key: 'content',
-      label: 'Content',
-      accessor: (row) => row.content,
+      key: 'date',
+      label: 'Date',
+      accessor: (row) => row.eventDate,
       // No width - will expand to fill available space
     },
+    'name',
+    'participantCount',
     {
       key: 'state',
       label: 'State',
@@ -143,24 +151,24 @@ export const BreakfastResource: ResourceDefinition<
       align: 'center',
     },
     {
-      key: 'editor',
-      label: 'Editor',
-      accessor: (row) => row['@parties']?.editor,
+      key: 'organizer',
+      label: 'Organizer',
+      accessor: (row) => row['@parties']?.organizer,
       render: (value) => (
         <PartiesDisplay 
-          parties={value ? { editor: value } : null} 
+          parties={value ? { organizer: value } : null} 
           mode="compact" 
         />
       ),
       width: '150px',
     },
     {
-      key: 'approver',
-      label: 'Approver',
-      accessor: (row) => row['@parties']?.approver,
+      key: 'everyone',
+      label: 'Everyone',
+      accessor: (row) => row['@parties']?.everyone,
       render: (value) => (
         <PartiesDisplay 
-          parties={value ? { approver: value } : null} 
+          parties={value ? { everyone: value } : null} 
           mode="compact" 
         />
       ),

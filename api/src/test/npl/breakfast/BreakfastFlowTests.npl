@@ -37,22 +37,22 @@ function test_complete_breakfast_flow(test: Test) -> {
     var dave = Participant[daveParty, everyone](name = "Dave Brown");
 
     // Step 2: Create a breakfast event for 5 people
-    var breakfast = BreakfastEvent[organizerParty, everyone]();
+    var breakfast = BreakfastEvent[organizerParty, everyone](name = "Team Breakfast", whatYouBring = optionalOf<Text>(), eventDate = localDateOf(2026, 3, 15));
 
     // Verify initial state
     test.assertEquals(BreakfastEvent.States.open, breakfast.activeState().getOrFail(), "Event should start in open state");
-    test.assertEquals(0, breakfast.getRegistrationCount[organizerParty](), "Should start with no registrations");
+    test.assertEquals(0, breakfast.participantCount, "Should start with no registrations");
 
     // Step 3: Register participants
     breakfast.registerAsParticipant[aliceParty](alice);
-    test.assertEquals(1, breakfast.getRegistrationCount[organizerParty](), "Should have 1 registration");
+    test.assertEquals(1, breakfast.participantCount, "Should have 1 registration");
     test.assertEquals(BreakfastEvent.States.open, breakfast.activeState().getOrFail(), "Should still be open");
 
     breakfast.registerAsParticipant[bobParty](bob);
-    test.assertEquals(2, breakfast.getRegistrationCount[organizerParty](), "Should have 2 registrations");
+    test.assertEquals(2, breakfast.participantCount, "Should have 2 registrations");
     test.assertEquals(BreakfastEvent.States.open, breakfast.activeState().getOrFail(), "Should still be open");
     breakfast.registerAsParticipant[carolParty](carol);
-    test.assertEquals(3, breakfast.getRegistrationCount[organizerParty](), "Should have 3 registrations");
+    test.assertEquals(3, breakfast.participantCount, "Should have 3 registrations");
     // Step 4: Register additional participants (no limit)
     breakfast.registerAsParticipant[daveParty](dave);
 
@@ -66,16 +66,16 @@ function test_complete_breakfast_flow(test: Test) -> {
 
     // Step 6: Unregister a participant
     breakfast.unregister[organizerParty](bob);
-    test.assertEquals(3, breakfast.getRegistrationCount[organizerParty](), "Should have 3 registrations after unregister");
+    test.assertEquals(3, breakfast.participantCount, "Should have 3 registrations after unregister");
     test.assertEquals(BreakfastEvent.States.open, breakfast.activeState().getOrFail(), "Should transition back to open state");
 
     // Step 7: Register another participant in the freed spot
     breakfast.register[organizerParty](dave);
-    test.assertEquals(4, breakfast.getRegistrationCount[organizerParty](), "Should have 4 registrations again");
+    test.assertEquals(4, breakfast.participantCount, "Should have 4 registrations again");
     // No full state, event remains open
     // Step 8: Register more participants (no limit)
     breakfast.register[organizerParty](bob);
-    test.assertEquals(5, breakfast.getRegistrationCount[organizerParty](), "Should have 5 registrations");
+    test.assertEquals(5, breakfast.participantCount, "Should have 5 registrations");
 
     // Step 10: Complete the event
     breakfast.complete[organizerParty]();
@@ -121,12 +121,12 @@ function test_event_cancellation(test: Test) -> {
     var bob = Participant[bobParty, everyone](name = "Bob");
 
     var organizerParty = participantOf("organizer@company.com");
-    var breakfast = BreakfastEvent[organizerParty, everyone]();
+    var breakfast = BreakfastEvent[organizerParty, everyone](name = "Team Breakfast", whatYouBring = optionalOf<Text>(), eventDate = localDateOf(2026, 3, 15));
 
     breakfast.register[organizerParty](alice);
     breakfast.register[organizerParty](bob);
 
-    test.assertEquals(2, breakfast.getRegistrationCount[organizerParty](), "Should have 2 registrations");
+    test.assertEquals(2, breakfast.participantCount, "Should have 2 registrations");
 
     // Cancel the event
     breakfast.cancel[organizerParty]();
@@ -147,14 +147,14 @@ function test_capacity_management(test: Test) -> {
     var carol = Participant[carolParty, everyone](name = "Carol");
 
     var organizerParty = participantOf("organizer@company.com");
-    var breakfast = BreakfastEvent[organizerParty, everyone]();
+    var breakfast = BreakfastEvent[organizerParty, everyone](name = "Team Breakfast", whatYouBring = optionalOf<Text>(), eventDate = localDateOf(2026, 3, 15));
 
     breakfast.register[organizerParty](alice);
     breakfast.register[organizerParty](bob);
 
     // Unlimited attendance: no capacity management needed
     breakfast.register[organizerParty](carol);
-    test.assertEquals(3, breakfast.getRegistrationCount[organizerParty](), "Should have 3 registrations after adding carol");
+    test.assertEquals(3, breakfast.participantCount, "Should have 3 registrations after adding carol");
 };
 
 /**
@@ -169,7 +169,7 @@ function test_unregister_non_existent(test: Test) -> {
     var bob = Participant[bobParty, everyone](name = "Bob");
 
     var organizerParty = participantOf("organizer@company.com");
-    var breakfast = BreakfastEvent[organizerParty, everyone]();
+    var breakfast = BreakfastEvent[organizerParty, everyone](name = "Team Breakfast", whatYouBring = optionalOf<Text>(), eventDate = localDateOf(2026, 3, 15));
 
     breakfast.register[organizerParty](alice);
 

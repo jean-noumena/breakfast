@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 import { discoverOpenapiSpecs } from '@npl/frontend/discover';
 
-discoverOpenapiSpecs()
+discoverOpenapiSpecs({
+  specDir: 'openapi',
+  // root: "openapi",
+  // configFile: './openapi/openapi-specs.json',
+})
   .then(() => {
     console.log('✅ Discovery complete');
   })

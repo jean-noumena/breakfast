@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { usePasswordAuth } from '../auth/PasswordAuthContext';
+import { usePasswordAuth } from '@npl/frontend';
 import './LoginPage.css';
 
 export const LoginPage: React.FC = () => {

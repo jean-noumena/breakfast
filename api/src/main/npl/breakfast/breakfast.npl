@@ -4,34 +4,6 @@ package breakfast
 const ISS = "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast";
 
 /**
- * Participant protocol representing a team member
- * @param participant The party representing this participant
- * @param name The name of the participant
- */
-@api
-// Paricipant claims: email, iss
-protocol[participant, everyone] Participant(
-    var name: Text
-) {
-    require(name.length() > 0, "Name cannot be empty");
-
-    /**
-     * Update the participant's name
-     * @param newName The new name
-     */
-    @api
-    permission[participant] updateName(newName: Text) {
-        require(newName.length() > 0, "Name cannot be empty");
-        name = newName;
-    };
-    
-    @api
-    permission[participant] registerForEvent(event: BreakfastEvent) {
-        event.registerAsParticipant[participant](this);
-    };
-};
-
-/**
  * Represents a breakfast registration entry
  * @param participant The participant who registered
  * @param registeredAt The timestamp when registration occurred
@@ -49,16 +21,19 @@ struct Registration {
  */
 @api
 protocol[organizer, everyone] BreakfastEvent(
+    var name: Text,
+    var whatYouBring: Optional<Text>,
+    var eventDate: LocalDate,
 ) {
-    // require(maxParticipants > 0, "Maximum participants must be positive");
-    var eventDate: LocalDate = now().toLocalDate().plus(days(7));
 
     initial state open;
     final state completed;
     final state cancelled;
 
     private var registrations = listOf<Registration>();
+    var participantCount: Number = 0;
 
+    /* not used as the everyone party is required for the participant protocol to be able to call the registerAsParticipant permission
     init {
         this.observers = mapOf(
             Pair("everyone", partyOf(
@@ -68,13 +43,14 @@ protocol[organizer, everyone] BreakfastEvent(
             ))
         );
         info(this.observers);
-    }
+    }*/
 
-    /**
-     * Get the current number of registrations
-     * @return The number of participants registered
-     */
-    function registrationCount() returns Number -> registrations.size();
+    @api
+    permission[organizer] updateEventDetails(newName: Text, newWhatYouBring: Optional<Text>, newEventDate: LocalDate) | open {
+        name = newName;
+        whatYouBring = newWhatYouBring;
+        eventDate = newEventDate;
+    };
 
     /**
      * Register a participant for the breakfast event
@@ -87,6 +63,7 @@ protocol[organizer, everyone] BreakfastEvent(
             registeredAt = now()
         );
         registrations = registrations.with(registration);
+        participantCount = participantCount + 1;
     };
 
     permission[*participant] registerAsParticipant(participantProtocol: Participant) | open {
@@ -102,15 +79,16 @@ protocol[organizer, everyone] BreakfastEvent(
         var matchingReg = registrations.filter(function(r: Registration) -> r.participant == participant).firstOrNone();
         require(matchingReg.isPresent(), "No registration found for this participant");
         registrations = registrations.without(matchingReg.getOrFail());
+        participantCount = participantCount - 1;
     };
 
     /**
      * Mark the event as completed
      */
     @api
-    permission[organizer] complete() | open {
+    obligation[organizer] complete() before eventDate.atStartOfDay("Z").plus(days(1)) | open {
         become completed;
-    };
+    } otherwise become completed;
 
     /**
      * Cancel the breakfast event
@@ -125,18 +103,7 @@ protocol[organizer, everyone] BreakfastEvent(
      * @return List of all registrations
      */
     @api
-    permission[organizer] getRegistrations() returns List<Registration> | open, completed {
+    permission[organizer] getRegistrations() returns List<Registration> | open, completed, cancelled {
         return registrations;
     };
-
-    /**
-     * Get the number of registered participants
-     * @return The count of registrations
-     */
-    @api
-    permission[organizer] getRegistrationCount() returns Number | open, completed {
-        return registrationCount();
-    };
-
-    // Removed updateMaxParticipants: unlimited attendance, no maxParticipants
 };

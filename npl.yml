@@ -1,11 +1,11 @@
 structure: # Configuration for project structure
   sourceDir: api/src/main
-  outputDir: frontend/openapi-specs # Directory for generated files (e.g., OpenAPI specs, PUML diagrams)
+  outputDir: frontend
   migration: api/src/main/migration.yml
 
 cloud: # Configuration for deploying to NOUMENA Cloud
-  tenant: my-tenant
-  app: my-npl-app
+  tenant: public
+  app: breakfast
 
 local: # Configuration for deploying to a local NOUMENA Engine instance
   managementUrl: http://localhost:12400

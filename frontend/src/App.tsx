@@ -1,9 +1,6 @@
-import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { AppLayout, PasswordAuthGuard, getMenuItems, DEFAULT_PATH } from '@npl/frontend'
 import { HomePage } from '@pages'
-import { PasswordAuthGuard } from './auth'
-import { AppLayout } from '@npl/frontend'
-import { getMenuItems, DEFAULT_PATH } from '@npl/frontend'
 import { ALL_RESOURCES } from '@resources'
 
 function App() {

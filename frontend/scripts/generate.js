@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 import { generateAll } from '@npl/frontend/generate';
 
-generateAll()
+generateAll({
+  configFile: './openapi-specs.json',
+  specDir: 'openapi',
+})
   .then(() => {
     console.log('✅ Generation complete');
   })
