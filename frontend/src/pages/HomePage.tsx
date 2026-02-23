@@ -13,14 +13,13 @@
 import { useState } from 'react';
 import { PartiesDisplay, SmartDetailView, SmartListView, StateBadge } from '@npl/frontend';
 import { ParticipantResource, BreakfastResource } from '@resources';
-import { UserMenu } from '@components';
 import { useAuth } from 'react-oidc-context';
 import { useGetParticipantList, useCreateParticipant } from '@gen/api/breakfast/default/default';
 import type { Participant } from '@gen/api/breakfast/breakfast.schemas';
 import { useQueryClient } from '@tanstack/react-query';
 import './HomePage.css';
 
-function HomePageContent() {
+export function HomePage() {
   const auth = useAuth();
   const queryClient = useQueryClient();
   const { data: participantsData, isLoading, error, refetch } = useGetParticipantList();
@@ -139,21 +138,5 @@ function HomePageContent() {
         />
       </section>
     </div>
-  );
-}
-
-export function HomePage() {
-  return (
-    <>
-      <div style={{ 
-        position: 'fixed', 
-        top: '16px', 
-        right: '16px', 
-        zIndex: 1000 
-      }}>
-        <UserMenu />
-      </div>
-      <HomePageContent />
-    </>
   );
 }

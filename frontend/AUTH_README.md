@@ -19,7 +19,6 @@ VITE_OIDC_POST_LOGOUT_REDIRECT_URI=http://localhost:5173
 
 - **OidcAuthProvider** (`@npl/frontend`): React context provider that manages OIDC authentication state using `react-oidc-context`
 - **OidcAuthGuard** (`@npl/frontend`): Route guard that protects authenticated routes and handles redirect flows
-- **UserMenu** (`src/components/UserMenu.tsx`): Displays user info and logout button
 
 ### Authentication Flow
 
@@ -57,7 +56,7 @@ The API client (`src/lib/api-client.ts`) automatically:
 ### Logout
 
 Users can logout by:
-- Clicking the logout button in UserMenu component
+- Clicking the logout button
 - User is redirected to OIDC provider for logout
 - After logout, user is redirected back to the app
 - All tokens and session data are cleared
