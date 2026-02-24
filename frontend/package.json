@@ -14,7 +14,7 @@
     "generate": "node scripts/generate.js"
   },
   "dependencies": {
-    "@npl/frontend": "file:npl-frontend-0.1.0.tgz",
+    "@npl/frontend": "file:../npl-frontend-0.1.0.tgz",
     "@tanstack/react-query": "^5.90.21",
     "axios": "^1.13.5",
     "lucide-react": "^0.468.0",

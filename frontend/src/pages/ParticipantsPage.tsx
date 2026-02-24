@@ -12,6 +12,7 @@
 import { Routes, Route, useParams } from 'react-router-dom';
 import { SmartListView, SmartDetailView, PartiesDisplay } from '@npl/frontend';
 import { ParticipantResource } from '@resources';
+import './ParticipantsPage.css';
 
 /**
  * ParticipantListView - Table view using SmartListView

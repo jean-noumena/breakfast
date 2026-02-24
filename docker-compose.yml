@@ -4,26 +4,24 @@ volumes:
 
 services:
   engine:
-    image: ghcr.io/noumenadigital/npl-integrations/engine:latest
-    build:
-      context: npl
+    image: ghcr.io/noumenadigital/images/engine:latest
     ports:
       - "12000:12000"
       - "12400:12400"
       - "12700:12700"
     environment:
       ENGINE_DEV_MODE: false
-      ENGINE_ALLOWED_ISSUERS: http://keycloak:11000/realms/${VITE_NC_APP_SLUG:-nplintegrations},http://localhost:11000/realms/${VITE_NC_APP_SLUG:-nplintegrations}
+      ENGINE_ALLOWED_ISSUERS: http://keycloak:11000/realms/${VITE_NC_APP_SLUG:-breakfast},http://localhost:11000/realms/${VITE_NC_APP_SLUG:-breakfast}
       ENGINE_DB_URL: "jdbc:postgresql://engine-db:5432/engine"
-      ENGINE_DB_USER: npl-integrations
+      ENGINE_DB_USER: breakfast
       ENGINE_DB_PASSWORD: secret
       ENGINE_DB_HISTORY_USER: history
       ENGINE_DB_HISTORY_SCHEMA: history
       ENGINE_DB_READ_MODEL_USER: postgraphile
-      ENGINE_ISSUER_OVERRIDE: http://keycloak:11000/realms/${VITE_NC_APP_SLUG:-nplintegrations}
+      ENGINE_ISSUER_OVERRIDE: http://keycloak:11000/realms/${VITE_NC_APP_SLUG:-breakfast}
       SWAGGER_ENGINE_URL: http://localhost:12000
-      SWAGGER_SECURITY_AUTH_URL: http://localhost:11000/realms/${VITE_NC_APP_SLUG:-nplintegrations}
-      SWAGGER_SECURITY_CLIENT_ID: ${VITE_NC_APP_SLUG:-nplintegrations}
+      SWAGGER_SECURITY_AUTH_URL: http://localhost:11000/realms/${VITE_NC_APP_SLUG:-breakfast}
+      SWAGGER_SECURITY_CLIENT_ID: ${VITE_NC_APP_SLUG:-breakfast}
       SWAGGER_SECURITY_CLIENT_SECRET:
       ENGINE_MANAGEMENT_HOST: 0.0.0.0
       ENGINE_MANAGEMENT_PORT: 12400
@@ -52,7 +50,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: engine
-      ENGINE_DB_USER: npl-integrations
+      ENGINE_DB_USER: breakfast
       ENGINE_DB_PASSWORD: secret
       HISTORY_DB_USER: history
       HISTORY_DB_PASSWORD: secret

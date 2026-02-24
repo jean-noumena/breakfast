@@ -1,72 +1,270 @@
+/* Noumena Digital Design System */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  /* Primary hue values for color system */
+  --hue-primary: 215;
+  --hue-accent: 200;
+  --hue-success: 145;
+  --hue-warning: 40;
+  --hue-danger: 355;
+  
+  /* Typography */
+  --font-family: system-ui, -apple-system, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: "SF Mono", Menlo, Monaco, "Courier New", monospace;
+  
+  /* Spacing scale */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  
+  /* Border radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
+  
+  /* Density */
+  --density: 1;
+  
+  /* Component tokens */
+  --button-padding-y: calc(0.5rem * var(--density));
+  --button-padding-x: calc(1rem * var(--density));
+  --button-font-size: 0.875rem;
+  --button-font-weight: 500;
+  --button-radius: var(--radius-sm);
+  
+  /* Form tokens */
+  --form-field-gap: calc(1rem * var(--density));
+  --form-label-size: 0.875rem;
+  --form-label-weight: 500;
+  --form-label-margin: 0.5rem;
+  --form-input-padding-y: calc(0.5rem * var(--density));
+  --form-input-padding-x: calc(0.75rem * var(--density));
+  --form-input-font-size: 0.875rem;
+  --form-input-radius: var(--radius-sm);
+  
+  /* Typography */
+  font-family: var(--font-family);
+  line-height: 1.6;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+/* Light theme colors */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  
+  /* Background colors */
+  --color-bg-page: hsl(var(--hue-primary), 25%, 98%);
+  --color-bg-surface: hsl(var(--hue-primary), 40%, 100%);
+  --color-bg-surface-secondary: hsl(var(--hue-primary), 35%, 98%);
+  --color-bg-surface-tertiary: hsl(var(--hue-primary), 30%, 96%);
+  --color-bg-overlay: hsla(var(--hue-primary), 20%, 15%, 0.6);
+  --color-bg-hover: hsla(var(--hue-primary), 60%, 50%, 0.08);
+  --color-bg-active: hsla(var(--hue-primary), 60%, 50%, 0.15);
+  --color-bg-selected: hsla(var(--hue-primary), 65%, 55%, 0.12);
+  
+  /* Text colors */
+  --color-text-primary: hsl(var(--hue-primary), 15%, 20%);
+  --color-text-secondary: hsl(var(--hue-primary), 12%, 45%);
+  --color-text-tertiary: hsl(var(--hue-primary), 10%, 60%);
+  --color-text-disabled: hsl(var(--hue-primary), 8%, 70%);
+  --color-text-inverse: hsl(var(--hue-primary), 40%, 100%);
+  
+  /* Border colors */
+  --color-border-light: hsla(var(--hue-primary), 20%, 50%, 0.12);
+  --color-border-medium: hsla(var(--hue-primary), 20%, 40%, 0.2);
+  --color-border-strong: hsla(var(--hue-primary), 20%, 30%, 0.3);
+  
+  /* Primary colors */
+  --color-primary-50: hsl(var(--hue-primary), 70%, 97%);
+  --color-primary-100: hsl(var(--hue-primary), 70%, 92%);
+  --color-primary-200: hsl(var(--hue-primary), 68%, 85%);
+  --color-primary-300: hsl(var(--hue-primary), 65%, 72%);
+  --color-primary-400: hsl(var(--hue-primary), 62%, 60%);
+  --color-primary-500: hsl(var(--hue-primary), 65%, 52%);
+  --color-primary-600: hsl(var(--hue-primary), 68%, 45%);
+  --color-primary-700: hsl(var(--hue-primary), 70%, 38%);
+  --color-primary-800: hsl(var(--hue-primary), 72%, 32%);
+  --color-primary-900: hsl(var(--hue-primary), 75%, 25%);
+  
+  /* Success colors */
+  --color-success-50: hsl(var(--hue-success), 60%, 96%);
+  --color-success-100: hsl(var(--hue-success), 55%, 88%);
+  --color-success-500: hsl(var(--hue-success), 55%, 48%);
+  --color-success-600: hsl(var(--hue-success), 58%, 40%);
+  --color-success-700: hsl(var(--hue-success), 60%, 32%);
+  
+  /* Danger colors */
+  --color-danger-50: hsl(var(--hue-danger), 85%, 97%);
+  --color-danger-100: hsl(var(--hue-danger), 80%, 92%);
+  --color-danger-500: hsl(var(--hue-danger), 75%, 58%);
+  --color-danger-600: hsl(var(--hue-danger), 78%, 50%);
+  --color-danger-700: hsl(var(--hue-danger), 80%, 42%);
+  
+  /* Warning colors */
+  --color-warning-50: hsl(var(--hue-warning), 90%, 95%);
+  --color-warning-100: hsl(var(--hue-warning), 85%, 85%);
+  --color-warning-500: hsl(var(--hue-warning), 85%, 55%);
+  --color-warning-600: hsl(var(--hue-warning), 88%, 48%);
+  --color-warning-700: hsl(var(--hue-warning), 90%, 42%);
+  
+  /* Semantic colors */
+  --color-link: var(--color-primary-600);
+  --color-link-hover: var(--color-primary-700);
+  --color-focus-ring: hsla(var(--hue-primary), 70%, 52%, 0.3);
+  
+  /* Form colors */
+  --color-input-bg: var(--color-bg-surface);
+  --color-input-border: var(--color-border-medium);
+  --color-input-border-focus: var(--color-primary-500);
 }
 
+/* Box sizing reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* HTML base */
+html {
+  font-family: var(--font-family);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Body */
 body {
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
   margin: 0;
   padding: 0;
-  min-width: 320px;
-  min-height: 100vh;
+  transition: background-color var(--transition-base), color var(--transition-base);
 }
 
+/* Root container */
 #root {
   width: 100%;
   min-height: 100vh;
 }
 
+/* Links */
+a {
+  color: var(--color-link);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-link-hover);
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: 2.25rem;
+  font-weight: 700;
 }
 
+h2 {
+  font-size: 1.875rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+/* Paragraphs */
+p {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+/* Buttons */
 button {
-  border-radius: 8px;
+  border-radius: var(--button-radius);
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
+  padding: var(--button-padding-y) var(--button-padding-x);
+  font-size: var(--button-font-size);
+  font-weight: var(--button-font-weight);
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--color-primary-500);
+  color: var(--color-text-inverse);
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  line-height: 1.5;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+button:hover:not(:disabled) {
+  background-color: var(--color-primary-600);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+/* Form inputs */
+input, select, textarea {
+  font-family: inherit;
+  font-size: var(--form-input-font-size);
+  padding: var(--form-input-padding-y) var(--form-input-padding-x);
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--form-input-radius);
+  background-color: var(--color-input-bg);
+  color: var(--color-text-primary);
+  transition: all var(--transition-fast);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-input-border-focus);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }

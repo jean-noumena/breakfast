@@ -52,6 +52,7 @@ resource "keycloak_realm" "realm" {
   reset_password_allowed   = true
   login_with_email_allowed = true
   registration_allowed = true
+  ssl_required = "none"
 }
 
 resource "keycloak_default_roles" "default_roles" {

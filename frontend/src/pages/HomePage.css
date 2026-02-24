@@ -1,127 +1,250 @@
 /**
  * HomePage Styles
  * 
- * Clean, modern landing page design with:
- * - Card-based resource grid
- * - Responsive layout
+ * Landing page with:
+ * - Profile section
+ * - Event listings
+ * - Noumena Digital design system
  */
 
 .home-page {
-  /* Full width - let content expand */
+  padding: var(--space-xl);
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: calc(100vh - 4rem);
 }
 
-.home-page__header {
-  margin-bottom: 48px;
-  padding-bottom: 24px;
-  border-bottom: 2px solid #e0e0e0;
+/* Welcome Section */
+.home-page__welcome {
+  background: linear-gradient(135deg, 
+    hsl(var(--hue-primary), 65%, 52%) 0%, 
+    hsl(var(--hue-primary), 68%, 45%) 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  margin-bottom: var(--space-2xl);
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-lg);
 }
 
-.home-page__title {
-  font-size: 32px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 8px 0;
+.home-page__welcome h1 {
+  color: var(--color-text-inverse);
+  font-size: 2.5rem;
+  margin-bottom: var(--space-sm);
 }
 
-.home-page__subtitle {
-  font-size: 16px;
-  color: #666;
-  margin: 0;
+.home-page__welcome p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.125rem;
 }
 
-.home-page__section {
-  margin-bottom: 48px;
+/* Profile Section */
+.home-page__profile {
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-2xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border-light);
+  transition: all var(--transition-base);
 }
 
-.home-page__section-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 24px 0;
-}
-
-/* Resource Cards */
-.home-page__cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-}
-
-.home-page__card {
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 24px;
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.home-page__card:hover {
-  border-color: #0066cc;
-  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.1);
+.home-page__profile:hover {
+  box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
 }
 
-.home-page__card:focus {
-  outline: 2px solid #0066cc;
-  outline-offset: 2px;
-}
-
-.home-page__card-icon {
-  color: #0066cc;
+.home-page__section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-lg);
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  background: #e6f2ff;
-  border-radius: 8px;
+  gap: var(--space-sm);
 }
 
-.home-page__card-title {
-  font-size: 20px;
+.home-page__section-title::before {
+  content: '';
+  width: 4px;
+  height: 1.5rem;
+  background: var(--color-primary-500);
+  border-radius: 2px;
+}
+
+/* Events Section */
+.home-page__events {
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border-light);
+}
+
+/* Create Profile Section */
+.home-page__create-profile {
+  text-align: center;
+  padding: var(--space-2xl);
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  max-width: 600px;
+  margin: var(--space-2xl) auto;
+  border: 1px solid var(--color-border-light);
+}
+
+.home-page__create-profile h2 {
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
+  font-size: 2rem;
+}
+
+.home-page__create-profile p {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-xl);
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+.home-page__create-button {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  background: var(--color-primary-500);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
   font-weight: 600;
-  color: #333;
-  margin: 0;
+  box-shadow: var(--shadow-md);
 }
 
-.home-page__card-description {
-  font-size: 14px;
-  color: #666;
-  margin: 0;
-  line-height: 1.5;
+.home-page__create-button:hover:not(:disabled) {
+  background: var(--color-primary-600);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
-/* Responsive */
+.home-page__create-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.home-page__error {
+  margin-top: var(--space-md);
+  color: var(--color-danger-600);
+  font-weight: 500;
+}
+
+/* Loading State */
+.home-page__loading {
+  padding: var(--space-2xl);
+  text-align: center;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border-light);
+}
+
+.home-page__loading p {
+  color: var(--color-text-secondary);
+  font-size: 1.125rem;
+}
+
+/* Error State */
+.home-page__error-container {
+  padding: var(--space-2xl);
+  text-align: center;
+  background: var(--color-danger-50);
+  border: 1px solid var(--color-danger-100);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.home-page__error-container p {
+  color: var(--color-danger-600);
+  font-weight: 500;
+  font-size: 1.125rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .home-page {
+    padding: var(--space-lg);
+  }
+  
+  .home-page__welcome h1 {
+    font-size: 2rem;
+  }
+}
+
 @media (max-width: 768px) {
-  .home-page__title {
-    font-size: 24px;
+  .home-page {
+    padding: var(--space-md);
   }
-
+  
+  .home-page__welcome {
+    padding: var(--space-xl);
+  }
+  
+  .home-page__welcome h1 {
+    font-size: 1.75rem;
+  }
+  
+  .home-page__welcome p {
+    font-size: 1rem;
+  }
+  
+  .home-page__profile,
+  .home-page__events {
+    padding: var(--space-lg);
+  }
+  
   .home-page__section-title {
-    font-size: 20px;
+    font-size: 1.25rem;
   }
+}
 
-  .home-page__cards {
-    grid-template-columns: 1fr;
+@media (max-width: 480px) {
+  .home-page__welcome h1 {
+    font-size: 1.5rem;
   }
+  
+  .home-page__create-button {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+  }
+}
 
-  .home-page__features {
-    grid-template-columns: 1fr;
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-page__profile,
+.home-page__events,
+.home-page__create-profile {
+  animation: fadeIn 0.3s ease-out;
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .home-page__card {
+  .home-page__profile,
+  .home-page__events,
+  .home-page__create-profile,
+  .home-page__profile:hover,
+  .home-page__create-button:hover:not(:disabled) {
+    animation: none;
     transition: none;
-  }
-
-  .home-page__card:hover {
     transform: none;
   }
 }
+
+

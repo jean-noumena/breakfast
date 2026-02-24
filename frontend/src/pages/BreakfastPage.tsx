@@ -12,6 +12,7 @@
 import { Routes, Route, useParams } from 'react-router-dom';
 import { SmartListView, SmartDetailView, StateBadge, PartiesDisplay } from '@npl/frontend';
 import { BreakfastResource } from '@resources';
+import './BreakfastPage.css';
 
 /**
  * BreakfastListView - Table view using SmartListView

@@ -1,0 +1,258 @@
+/**
+ * ParticipantsPage Styles
+ * 
+ * Custom styling for Participants list and detail views
+ * Extends Noumena Digital design system
+ */
+
+/* Page container enhancements */
+.participants-page {
+  padding: var(--space-xl);
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Override SmartListView header */
+.participants-page .page-header {
+  background: linear-gradient(135deg, 
+    hsl(var(--hue-accent), 60%, 50%) 0%, 
+    hsl(var(--hue-accent), 63%, 42%) 100%);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  margin-bottom: var(--space-xl);
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-md);
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.participants-page .page-header h1 {
+  color: var(--color-text-inverse);
+  font-size: 2rem;
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.participants-page .page-header .subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  display: block;
+  margin-top: var(--space-xs);
+}
+
+.participants-page .create-button {
+  background: var(--color-bg-surface);
+  color: var(--color-accent-600);
+  border: 2px solid transparent;
+  font-weight: 600;
+  transition: all var(--transition-base);
+}
+
+.participants-page .create-button:hover {
+  background: var(--color-bg-surface);
+  border-color: var(--color-accent-100);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Table styling improvements */
+.participants-page .page-content {
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border-light);
+}
+
+.participants-page table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.participants-page th {
+  background: var(--color-bg-surface-secondary);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.5rem;
+  text-align: left;
+  border-bottom: 2px solid var(--color-border-medium);
+}
+
+.participants-page td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--color-border-light);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+}
+
+.participants-page tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.participants-page tbody tr:hover {
+  background: var(--color-bg-hover);
+  cursor: pointer;
+}
+
+.participants-page tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Action buttons in table */
+.participants-page .action-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  margin-right: 0.5rem;
+}
+
+.participants-page .action-button:last-child {
+  margin-right: 0;
+}
+
+.participants-page .action-primary {
+  background: var(--color-accent-500);
+  color: var(--color-text-inverse);
+}
+
+.participants-page .action-primary:hover {
+  background: var(--color-accent-600);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.participants-page .action-secondary {
+  background: var(--color-bg-surface-tertiary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-medium);
+}
+
+.participants-page .action-secondary:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-strong);
+}
+
+/* Detail view enhancements */
+.participants-page .smart-detail-header {
+  background: linear-gradient(135deg, 
+    hsl(var(--hue-accent), 60%, 50%) 0%, 
+    hsl(var(--hue-accent), 63%, 42%) 100%);
+  color: var(--color-text-inverse);
+  padding: var(--space-2xl);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.participants-page .smart-detail-header h2 {
+  color: var(--color-text-inverse);
+}
+
+.participants-page .smart-detail-header .entity-id {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.participants-page .smart-detail-fields {
+  background: var(--color-bg-surface);
+  padding: var(--space-xl);
+}
+
+.participants-page .smart-detail-field {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.participants-page .smart-detail-field:last-child {
+  border-bottom: none;
+}
+
+.participants-page .field-label {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-xs);
+}
+
+.participants-page .field-value {
+  color: var(--color-text-primary);
+  font-size: 0.9375rem;
+}
+
+/* Pagination styling */
+.participants-page .smart-table-pagination {
+  padding: var(--space-lg);
+  background: var(--color-bg-surface-secondary);
+  border-top: 1px solid var(--color-border-light);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.participants-page .smart-table-pagination button {
+  background: var(--color-accent-500);
+  color: var(--color-text-inverse);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.participants-page .smart-table-pagination button:disabled {
+  background: var(--color-text-disabled);
+  opacity: 0.5;
+}
+
+.participants-page .smart-table-pagination button:not(:disabled):hover {
+  background: var(--color-accent-600);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .participants-page {
+    padding: var(--space-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  .participants-page {
+    padding: var(--space-md);
+  }
+  
+  .participants-page .page-header {
+    padding: var(--space-xl);
+  }
+  
+  .participants-page .page-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .participants-page th,
+  .participants-page td {
+    padding: 0.75rem 1rem;
+    font-size: 0.8125rem;
+  }
+  
+  .participants-page .action-button {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Loading and error states */
+.participants-page .smart-table-loading,
+.participants-page .smart-table-error,
+.participants-page .smart-table-empty {
+  padding: var(--space-2xl);
+  text-align: center;
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+}
+
+.participants-page .smart-table-error {
+  color: var(--color-danger-600);
+}

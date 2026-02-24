@@ -11,7 +11,7 @@
  */
 
 import { useState } from 'react';
-import { PartiesDisplay, SmartDetailView, SmartListView, StateBadge } from '@npl/frontend';
+import { PartiesDisplay, SmartDetail, SmartTable, StateBadge } from '@npl/frontend';
 import { ParticipantResource, BreakfastResource } from '@resources';
 import { useAuth } from 'react-oidc-context';
 import { useGetParticipantList, useCreateParticipant } from '@gen/api/breakfast/default/default';
@@ -31,16 +31,20 @@ export function HomePage() {
 
   if (isLoading) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <p>Loading your profile...</p>
+      <div className="home-page">
+        <div className="home-page__loading">
+          <p>Loading your profile...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center', color: 'red' }}>
-        <p>Error loading participants: {error.message}</p>
+      <div className="home-page">
+        <div className="home-page__error-container">
+          <p>Error loading participants: {error.message}</p>
+        </div>
       </div>
     );
   }
@@ -77,32 +81,25 @@ export function HomePage() {
     };
 
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <h2>Welcome, {auth.user?.profile?.name || 'User'}!</h2>
-        <p style={{ marginTop: '1rem', marginBottom: '2rem' }}>
-          You don't have a participant profile yet.
-        </p>
-        <button
-          onClick={handleCreateParticipant}
-          disabled={createParticipant.isPending}
-          style={{
-            padding: '0.75rem 1.5rem',
-            fontSize: '1rem',
-            backgroundColor: '#0066cc',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: createParticipant.isPending ? 'not-allowed' : 'pointer',
-            opacity: createParticipant.isPending ? 0.6 : 1
-          }}
-        >
-          {createParticipant.isPending ? 'Creating Profile...' : 'Create My Profile'}
-        </button>
-        {createParticipant.isError && (
-          <p style={{ marginTop: '1rem', color: 'red' }}>
-            Failed to create profile. Please try again.
+      <div className="home-page">
+        <div className="home-page__create-profile">
+          <h2>Welcome, {auth.user?.profile?.name || 'User'}!</h2>
+          <p>
+            You don't have a participant profile yet. Create one to start organizing and joining breakfast events!
           </p>
-        )}
+          <button
+            onClick={handleCreateParticipant}
+            disabled={createParticipant.isPending}
+            className="home-page__create-button"
+          >
+            {createParticipant.isPending ? 'Creating Profile...' : 'Create My Profile'}
+          </button>
+          {createParticipant.isError && (
+            <p className="home-page__error">
+              Failed to create profile. Please try again.
+            </p>
+          )}
+        </div>
       </div>
     );
   }
@@ -111,13 +108,16 @@ export function HomePage() {
   const participantId = matchedParticipant['@id'];
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1 style={{ marginBottom: '2rem' }}>Welcome, {auth.user?.profile?.name || 'User'}!</h1>
+    <div className="home-page">
+      <div className="home-page__welcome">
+        <h1>Welcome, {auth.user?.profile?.name || 'User'}!</h1>
+        <p>Manage your breakfast events and connect with other participants</p>
+      </div>
       
       {/* Participant Detail View */}
-      <section style={{ marginBottom: '3rem' }}>
-        <h2 style={{ marginBottom: '1rem' }}>Your Profile</h2>
-        <SmartDetailView
+      <section className="home-page__profile">
+        <h2 className="home-page__section-title">Your Profile</h2>
+        <SmartDetail
           resource={ParticipantResource}
           entityId={participantId}
           fieldRenderers={{
@@ -130,9 +130,9 @@ export function HomePage() {
       </section>
 
       {/* All Breakfast Events List */}
-      <section>
-        <h2 style={{ marginBottom: '1rem' }}>All Breakfast Events</h2>
-        <SmartListView
+      <section className="home-page__events">
+        <h2 className="home-page__section-title">All Breakfast Events</h2>
+        <SmartTable
           resource={BreakfastResource}
           pageSize={10}
         />
