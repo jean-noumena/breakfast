@@ -3,19 +3,43 @@ breakfast.Participant:
     set:
       claims:
         iss:
-          - "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast" # TODO add issuer # "http://localhost:11000" # 
+          # - "http://localhost:11000/realms/breakfast"
+          - "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast"
   participant:
     extract:
       claims:
         - preferred_username
+        - email
+  admin:
+    set:
+      claims:
+        role:
+          - "admin"
+  emailservice:
+    set:
+      claims:
+        party:
+          - "email_connector"
 
 breakfast.BreakfastEvent:
   everyone:
     set:
       claims:
         iss:
-          - "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast" # TODO add issuer # "http://localhost:11000" # 
+          # - "http://localhost:11000/realms/breakfast"
+          - "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast"
   organizer:
     extract:
       claims:
         - preferred_username
+        - email
+  admin:
+    set:
+      claims:
+        role:
+          - "admin"
+  emailservice:
+    set:
+      claims:
+        party:
+          - "email_connector"

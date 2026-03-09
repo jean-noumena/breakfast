@@ -30,10 +30,12 @@ import {
   useCreateBreakfastEvent,
   useBreakfastEventRegister,
   useBreakfastEventGetRegistrations,
+  useBreakfastEventHideEvent,
 } from '@gen/api/breakfast/default/default';
 
 // Import generated Zod schemas
 import { schemas } from '@gen/zod/breakfast';
+import { z } from 'zod';
 
 /**
  * Action: Register Breakfast
@@ -87,6 +89,32 @@ const getRegistrationsAction: ActionDefinition<void, BreakfastEvent> = {
 };
 
 /**
+ * Action: Hide Event
+ * 
+ * Hides the breakfast event by obfuscating party information.
+ * Available only to admin party.
+ * Server determines visibility via @actions.hideEvent
+ */
+const hideEventAction: ActionDefinition<void, string> = {
+  name: 'hideEvent',
+  label: 'Hide Event',
+  description: 'Hide this breakfast event',
+  variant: 'danger',
+  icon: 'eye-off',
+
+  // Generated mutation hook from Orval
+  mutationHook: useBreakfastEventHideEvent,
+
+  // Return schema for response validation (returns Text)
+  returnSchema: z.string(),
+
+  // No form needed - direct action
+  showPayloadForm: false,
+  requiresConfirmation: true,
+  confirmationMessage: 'Are you sure you want to hide this event? This action cannot be undone.',
+};
+
+/**
  * Breakfast Resource Definition
  * 
  * This is the complete resource configuration consumed by SmartTable
@@ -105,7 +133,7 @@ export const BreakfastResource: ResourceDefinition<
 
   // Reference configuration
   referenceKey: 'BreakfastEvent',
-  formatLabel: (doc) => doc.eventDate.substring(0, 50),
+  formatLabel: (breakfast) => breakfast.eventDate + " - " + breakfast.name.substring(0, 10),
 
   // Generated React Query hooks
   listHook: useGetBreakfastEventList,
@@ -117,7 +145,7 @@ export const BreakfastResource: ResourceDefinition<
 
   // Available actions
   // SmartTable will filter these based on entity['@actions']
-  actions: [registerAction, getRegistrationsAction],
+  actions: [registerAction, getRegistrationsAction, hideEventAction],
 
   party: {
     organizer: {
@@ -140,7 +168,12 @@ export const BreakfastResource: ResourceDefinition<
       accessor: (row) => row.eventDate,
       // No width - will expand to fill available space
     },
-    'name',
+    {
+      key: 'name',
+      label: 'Name',
+      render: (value) => (value as string).substring(0, 20) + ((value as string).length > 20 ? '...' : ''),
+      width: '200px',
+    },
     'participantCount',
     {
       key: 'state',
@@ -157,18 +190,6 @@ export const BreakfastResource: ResourceDefinition<
       render: (value) => (
         <PartiesDisplay 
           parties={value ? { organizer: value } : null} 
-          mode="compact" 
-        />
-      ),
-      width: '150px',
-    },
-    {
-      key: 'everyone',
-      label: 'Everyone',
-      accessor: (row) => row['@parties']?.everyone,
-      render: (value) => (
-        <PartiesDisplay 
-          parties={value ? { everyone: value } : null} 
           mode="compact" 
         />
       ),

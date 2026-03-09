@@ -1,7 +1,7 @@
 package breakfast
 
-// const ISS = "http://localhost:11000"; // "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast"; // TODO add issuer
-const ISS = "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast";
+use connector.v1.email.SendEmailNotification;
+use connector.v1.email.SendEmailResponse
 
 /**
  * Represents a breakfast registration entry
@@ -20,30 +20,38 @@ struct Registration {
  * @param maxParticipants The maximum number of participants allowed
  */
 @api
-protocol[organizer, everyone] BreakfastEvent(
+protocol[organizer, everyone, admin, emailservice] BreakfastEvent(
     var name: Text,
     var whatYouBring: Optional<Text>,
     var eventDate: LocalDate,
 ) {
 
     initial state open;
-    final state completed;
-    final state cancelled;
+    state completed;
+    state cancelled;
+    final state hidden;
 
     private var registrations = listOf<Registration>();
     var participantCount: Number = 0;
 
-    /* not used as the everyone party is required for the participant protocol to be able to call the registerAsParticipant permission
     init {
-        this.observers = mapOf(
-            Pair("everyone", partyOf(
-                mapOf(
-                    Pair("iss", setOf(ISS))
-                )
-            ))
-        );
-        info(this.observers);
-    }*/
+        this.sendCreationEmail[emailservice]();
+    }
+
+    permission[emailservice] sendCreationEmail() {
+        if (organizer.claims().getOrNone("email").isPresent() && organizer.claims().getOrNone("email").getOrFail().size() == 1) {
+            notify SendEmailNotification(
+                organizer.claims().getOrNone("email").getOrFail().toList().get(0),
+                "Breakfast Event Created",
+                "A new breakfast event has been created with the name: " + name
+            ) resume organizerCreationEmailCallback;
+        };
+    }
+
+    @api
+    permission[emailservice] organizerCreationEmailCallback(r: NotifyResult<SendEmailResponse>)  {
+        info("Received registration email callback for organizer: " + r.toText());
+    };
 
     @api
     permission[organizer] updateEventDetails(newName: Text, newWhatYouBring: Optional<Text>, newEventDate: LocalDate) | open {
@@ -64,6 +72,37 @@ protocol[organizer, everyone] BreakfastEvent(
         );
         registrations = registrations.with(registration);
         participantCount = participantCount + 1;
+
+        this.sendEmailNotifications[emailservice](participant);
+    }
+
+    permission[emailservice] sendEmailNotifications(participant: Participant) {
+        var participantEmail = participant.getEmailClaims[everyone]();
+        if (participantEmail.isPresent() && participantEmail.getOrFail().size() == 1) {
+            notify SendEmailNotification(
+                participantEmail.getOrFail().toList().get(0),
+                "Breakfast Registration Confirmed",
+                "You have been registered for the breakfast event: " + name
+            ) resume participantEmailCallback;
+        };
+        var organizerEmail = organizer.claims().getOrNone("email");
+        if (organizerEmail.isPresent() && organizerEmail.getOrFail().size() == 1) {
+            notify SendEmailNotification(
+                organizerEmail.getOrFail().toList().get(0),
+                "New Participant Registered",
+                "A new participant has registered for the breakfast event: " + name + "\nParticipant Name: " + participant.name
+            ) resume organizerEmailCallback;
+        };
+    };
+
+    @api
+    permission[emailservice] participantEmailCallback(r: NotifyResult<SendEmailResponse>)  {
+        info("Received registration email callback for participant: " + r.toText());
+    };
+
+    @api
+    permission[emailservice] organizerEmailCallback(r: NotifyResult<SendEmailResponse>)  {
+        info("Received registration email callback for organizer: " + r.toText());
     };
 
     permission[*participant] registerAsParticipant(participantProtocol: Participant) | open {
@@ -105,5 +144,21 @@ protocol[organizer, everyone] BreakfastEvent(
     @api
     permission[organizer] getRegistrations() returns List<Registration> | open, completed, cancelled {
         return registrations;
+    };
+
+    @api
+    permission[admin] updateOrganizerEmail(newEmail: Text) {
+        organizer = partyOf(organizer.claims().plus(mapOf(Pair("email", setOf(newEmail)))));
+    };
+
+    @api
+    permission[admin] hideEvent() returns Text {
+        var randomClaim = "randomClaim" + now().nano().toText() + "_" + now().toText(); // Generate a random claim to obfuscate the party
+        var randomParty = partyOf(mapOf(Pair(randomClaim, setOf(randomClaim + "_value"))));
+        organizer = randomParty;
+        everyone = randomParty;
+        admin = randomParty;
+        become hidden;
+        return "Event is now hidden";
     };
 };

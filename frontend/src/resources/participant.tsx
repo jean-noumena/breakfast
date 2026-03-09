@@ -124,7 +124,12 @@ export const ParticipantResource: ResourceDefinition<
       accessor: (row) => row['@id'],
       width: '280px',
     },
-    'name'
+    {
+      key: 'name',
+      label: 'Name',
+      render: (value) => (value as string).substring(0, 20) + ((value as string).length > 20 ? '...' : ''),
+      width: '200px',
+    },
   ],
 
   // Pagination configuration

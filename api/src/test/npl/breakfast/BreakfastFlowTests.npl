@@ -1,5 +1,8 @@
 package breakfast
 
+// const ISS = "http://localhost:11000";
+const ISS = "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast";
+
 function participantOf(email: Text) returns Party -> {
     return partyOf(
         mapOf(
@@ -9,10 +12,18 @@ function participantOf(email: Text) returns Party -> {
     );
 }
 
-
 function everyoneOf() returns Party -> {
     return partyOf(
         mapOf(
+            Pair("iss", setOf(ISS))
+        )
+    );
+}
+
+function adminOf() returns Party -> {
+    return partyOf(
+        mapOf(
+            Pair("role", setOf("admin")),
             Pair("iss", setOf(ISS))
         )
     );
@@ -30,14 +41,15 @@ function test_complete_breakfast_flow(test: Test) -> {
     var daveParty = participantOf("dave@company.com");
     var organizerParty = participantOf("organizer@company.com");
     var everyone = everyoneOf();
+    var admin = adminOf();
 
-    var alice = Participant[aliceParty, everyone](name = "Alice Smith");
-    var bob = Participant[bobParty, everyone](name = "Bob Jones");
-    var carol = Participant[carolParty, everyone](name = "Carol White");
-    var dave = Participant[daveParty, everyone](name = "Dave Brown");
+    var alice = Participant[aliceParty, everyone, admin](name = "Alice Smith");
+    var bob = Participant[bobParty, everyone, admin](name = "Bob Jones");
+    var carol = Participant[carolParty, everyone, admin](name = "Carol White");
+    var dave = Participant[daveParty, everyone, admin](name = "Dave Brown");
 
     // Step 2: Create a breakfast event for 5 people
-    var breakfast = BreakfastEvent[organizerParty, everyone](name = "Team Breakfast", whatYouBring = optionalOf<Text>(), eventDate = localDateOf(2026, 3, 15));
+    var breakfast = BreakfastEvent[organizerParty, everyone, admin](name = "Team Breakfast", whatYouBring = optionalOf<Text>(), eventDate = localDateOf(2026, 3, 15));
 
     // Verify initial state
     test.assertEquals(BreakfastEvent.States.open, breakfast.activeState().getOrFail(), "Event should start in open state");
@@ -94,7 +106,8 @@ function test_participant_updates(test: Test) -> {
     // Create a participant
     var johnParty = participantOf("john@company.com");
     var everyone = everyoneOf();
-    var participant = Participant[johnParty, everyone](name = "John Doe");
+    var admin = adminOf();
+    var participant = Participant[johnParty, everyone, admin](name = "John Doe");
 
     test.assertEquals("John Doe", participant.name, "Initial name should be John Doe");
 
@@ -117,11 +130,12 @@ function test_event_cancellation(test: Test) -> {
     var aliceParty = participantOf("alice@company.com");
     var bobParty = participantOf("bob@company.com");
     var everyone = everyoneOf();
-    var alice = Participant[aliceParty, everyone](name = "Alice");
-    var bob = Participant[bobParty, everyone](name = "Bob");
+    var admin = adminOf();
+    var alice = Participant[aliceParty, everyone, admin](name = "Alice");
+    var bob = Participant[bobParty, everyone, admin](name = "Bob");
 
     var organizerParty = participantOf("organizer@company.com");
-    var breakfast = BreakfastEvent[organizerParty, everyone](name = "Team Breakfast", whatYouBring = optionalOf<Text>(), eventDate = localDateOf(2026, 3, 15));
+    var breakfast = BreakfastEvent[organizerParty, everyone, admin](name = "Team Breakfast", whatYouBring = optionalOf<Text>(), eventDate = localDateOf(2026, 3, 15));
 
     breakfast.register[organizerParty](alice);
     breakfast.register[organizerParty](bob);
@@ -142,12 +156,13 @@ function test_capacity_management(test: Test) -> {
     var bobParty = participantOf("bob@company.com");
     var carolParty = participantOf("carol@company.com");
     var everyone = everyoneOf();
-    var alice = Participant[aliceParty, everyone](name = "Alice");
-    var bob = Participant[bobParty, everyone](name = "Bob");
-    var carol = Participant[carolParty, everyone](name = "Carol");
+    var admin = adminOf();
+    var alice = Participant[aliceParty, everyone, admin](name = "Alice");
+    var bob = Participant[bobParty, everyone, admin](name = "Bob");
+    var carol = Participant[carolParty, everyone, admin](name = "Carol");
 
     var organizerParty = participantOf("organizer@company.com");
-    var breakfast = BreakfastEvent[organizerParty, everyone](name = "Team Breakfast", whatYouBring = optionalOf<Text>(), eventDate = localDateOf(2026, 3, 15));
+    var breakfast = BreakfastEvent[organizerParty, everyone, admin](name = "Team Breakfast", whatYouBring = optionalOf<Text>(), eventDate = localDateOf(2026, 3, 15));
 
     breakfast.register[organizerParty](alice);
     breakfast.register[organizerParty](bob);
@@ -165,11 +180,12 @@ function test_unregister_non_existent(test: Test) -> {
     var aliceParty = participantOf("alice@company.com");
     var bobParty = participantOf("bob@company.com");
     var everyone = everyoneOf();
-    var alice = Participant[aliceParty, everyone](name = "Alice");
-    var bob = Participant[bobParty, everyone](name = "Bob");
+    var admin = adminOf();
+    var alice = Participant[aliceParty, everyone, admin](name = "Alice");
+    var bob = Participant[bobParty, everyone, admin](name = "Bob");
 
     var organizerParty = participantOf("organizer@company.com");
-    var breakfast = BreakfastEvent[organizerParty, everyone](name = "Team Breakfast", whatYouBring = optionalOf<Text>(), eventDate = localDateOf(2026, 3, 15));
+    var breakfast = BreakfastEvent[organizerParty, everyone, admin](name = "Team Breakfast", whatYouBring = optionalOf<Text>(), eventDate = localDateOf(2026, 3, 15));
 
     breakfast.register[organizerParty](alice);
 

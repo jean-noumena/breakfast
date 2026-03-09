@@ -1,0 +1,58 @@
+package connector.v1.blockchain
+
+use connector.v1.blockchain.BlockchainType
+use connector.v1.blockchain.BlockchainStatus
+
+enum WalletType { 
+  Ethereum,
+  Stellar
+}
+
+enum WalletStorageType { 
+  Vault,
+  AzureHSM
+}
+
+struct Asset {
+  assetCode: Text,
+  assetIssuer: Text,
+}
+
+struct WalletCreate {
+  walletType: WalletType,
+  storageType: WalletStorageType,
+  faucetFund: Optional<Number>
+}
+
+notification WalletCreateMessage(
+  create: WalletCreate
+) returns WalletCreateResponse;
+
+struct WalletCreateResponse {
+    status: BlockchainStatus,
+    walletAddress: Optional<Text>,
+    errorCode: Optional<Text>,
+    details: Optional<Text>
+};
+
+struct WalletFaucetFund {
+  address: Text,
+  // NOTE: Stellar requires accounts to hold a minimum balance of 1 XLM before they actually exist,
+  // See https://developers.stellar.org/docs/learn/fundamentals/lumens#minimum-balance
+  amount: Number,
+  // NOTE: Stellar requires trust lines to be established with certain assets in order to hold them in the wallet,
+  // See https://developers.stellar.org/docs/build/guides/basics/verify-trustlines
+  assets: List<Asset>,
+  blockchainType: BlockchainType
+}
+
+notification WalletFaucetFundMessage(
+  fund: WalletFaucetFund
+) returns WalletFaucetFundResponse;
+
+struct WalletFaucetFundResponse {
+    status: BlockchainStatus,
+    hash: Optional<Text>,
+    errorCode: Optional<Text>,
+    details: Optional<Text>
+};

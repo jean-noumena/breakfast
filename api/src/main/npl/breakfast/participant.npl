@@ -1,16 +1,38 @@
 package breakfast;
 
- /**
- * Participant protocol representing a team member
- * @param participant The party representing this participant
- * @param name The name of the participant
- */
+use connector.v1.email.SendEmailNotification
+use connector.v1.email.SendEmailResponse
+
+/**
+* Participant protocol representing a team member
+* @param participant The party representing this participant
+* @param name The name of the participant
+*/
 @api
-    // Paricipant claims: email, iss
-protocol[participant, everyone] Participant(
+// Paricipant claims: preferred_username, email, iss
+protocol[participant, everyone, admin, emailservice] Participant(
     var name: Text
 ) {
     require(name.length() > 0, "Name cannot be empty");
+
+    init {
+        this.sendInitialEmail[emailservice]();
+    }
+
+    permission[emailservice] sendInitialEmail() {
+        if (participant.claims().getOrNone("email").isPresent() && participant.claims().getOrNone("email").getOrFail().size() == 1) {
+            notify SendEmailNotification(
+                participant.claims().getOrNone("email").getOrFail().toList().get(0),
+                "Welcome to the Breakfast Event app",
+                "Hi " + name + ",\n\nWelcome to the Breakfast Event app! You can now register for breakfast events organized by your team. We look forward to seeing you at the next breakfast event!\n\nBest regards,\nThe Breakfast Event Team"
+            ) resume participantEmailCallback;
+        };
+    }
+
+    @api
+    permission[emailservice] participantEmailCallback(r: NotifyResult<SendEmailResponse>) {
+        info("Received email callback for participant: " + r.toText());
+    };
 
     /**
      * Update the participant's name
@@ -25,5 +47,14 @@ protocol[participant, everyone] Participant(
     @api
     permission[participant] registerForEvent(event: BreakfastEvent) {
         event.registerAsParticipant[participant](this);
+    };
+
+    @api
+    permission[admin] updateParticipantEmail(newEmail: Text) {
+        participant = partyOf(participant.claims().plus(mapOf(Pair("email", setOf(newEmail)))));
+    };
+
+    permission[everyone] getEmailClaims() returns Optional<Set<Text>> {
+        return participant.claims().getOrNone("email");
     };
 };

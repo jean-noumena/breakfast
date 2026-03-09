@@ -1,0 +1,15 @@
+package connector.v1.email
+
+enum EmailStatus {
+    Success,
+    Failure
+}
+
+notification SendEmailNotification(to: Text, subject: Text, body: Text) returns SendEmailResponse;
+
+struct SendEmailResponse {
+    status: EmailStatus,
+    recipientAddress: Text,
+    errorCode: Optional<Text>,
+    details: Optional<Text>
+};

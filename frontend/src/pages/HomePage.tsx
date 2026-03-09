@@ -10,12 +10,12 @@
  * This page is shown when no menu item is selected.
  */
 
-import { useState } from 'react';
-import { PartiesDisplay, SmartDetail, SmartTable, StateBadge } from '@npl/frontend';
+import { useState, type JSX } from 'react';
+import { ActionModal, PartiesDisplay, SmartDetail, SmartTable, type ActionDefinition, type Party, type ResourceDefinition } from '@npl/frontend';
 import { ParticipantResource, BreakfastResource } from '@resources';
 import { useAuth } from 'react-oidc-context';
 import { useGetParticipantList, useCreateParticipant } from '@gen/api/breakfast/default/default';
-import type { Participant } from '@gen/api/breakfast/breakfast.schemas';
+import type { GetParticipantListParams , ParticipantCreate, _Party, Participant } from '@gen/api/breakfast/breakfast.schemas';
 import { useQueryClient } from '@tanstack/react-query';
 import './HomePage.css';
 
@@ -25,6 +25,13 @@ export function HomePage() {
   const { data: participantsData, isLoading, error, refetch } = useGetParticipantList();
   const createParticipant = useCreateParticipant();
   const [newlyCreatedParticipant, setNewlyCreatedParticipant] = useState<Participant | null>(null);
+
+  const [selectedAction, setSelectedAction] = useState<ActionDefinition | null>(null);
+  const [selectedEntity, setSelectedEntity] = useState<ResourceDefinition<
+  Participant,
+  GetParticipantListParams,
+  ParticipantCreate
+> | null>(null);
 
   // Get authenticated user's preferred_username
   const userPreferredUsername = auth.user?.profile?.preferred_username;
@@ -55,7 +62,8 @@ export function HomePage() {
   if (!matchedParticipant) {
     // Find participant whose participant party preferred_username matches the authenticated user
     matchedParticipant = participantsData?.items?.find((participant: Participant) => {
-      const participantClaims = participant['@parties']?.participant?.claims?.preferred_username;
+      const participantParty = participant['@parties']?.participant as _Party | undefined;
+      const participantClaims = participantParty?.claims?.preferred_username;
       return participantClaims && userPreferredUsername && participantClaims.includes(userPreferredUsername);
     }) || null;
   }
@@ -66,7 +74,11 @@ export function HomePage() {
       try {
         const response = await createParticipant.mutateAsync({
           data: {
-            name: auth.user?.profile?.name || 'User',
+            name: auth.user?.profile?.name ||
+              auth.user?.profile?.preferred_username ||
+              (auth.user?.profile?.first_name as string | undefined) ||
+              auth.user?.profile?.email ||
+              'User',
             "@parties": {}
           }
         });
@@ -107,6 +119,24 @@ export function HomePage() {
   // Handle case: participant found - show detail + all events
   const participantId = matchedParticipant['@id'];
 
+  const handleActionClick = (action: ActionDefinition, entity: ResourceDefinition<
+  Participant,
+  GetParticipantListParams,
+  ParticipantCreate
+>) => {
+    setSelectedAction(action);
+    setSelectedEntity(entity);
+  };
+
+  const handleModalClose = () => {
+    setSelectedAction(null);
+    setSelectedEntity(null);
+  };
+
+  const handleActionSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: [ParticipantResource.name, participantId] });
+  };
+
   return (
     <div className="home-page">
       <div className="home-page__welcome">
@@ -121,11 +151,14 @@ export function HomePage() {
           resource={ParticipantResource}
           entityId={participantId}
           fieldRenderers={{
-            // Use StateBadge component for state field
-            '@state': (value) => <StateBadge state={value as string} />,
             // Use PartiesDisplay component for parties field
-            '@parties': (value) => <PartiesDisplay parties={value} mode="inline" />,
-          }}
+            '@parties': (value: Record<string, Party>) => <PartiesDisplay parties={value} mode="inline" />,
+          } as Record<string, (value: unknown, entity: ResourceDefinition<Participant, GetParticipantListParams, ParticipantCreate>) => JSX.Element>}
+          onActionClick={handleActionClick as (action: ActionDefinition, entity: ResourceDefinition<
+  Participant,
+  GetParticipantListParams,
+  ParticipantCreate
+>) => void}
         />
       </section>
 
@@ -137,6 +170,20 @@ export function HomePage() {
           pageSize={10}
         />
       </section>
+      
+      {/* Action Modal - only renders when an action is selected */}
+      {selectedAction && selectedEntity && (
+        <ActionModal
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          action={selectedAction as ActionDefinition<any, any>}
+          entity={selectedEntity}
+          isOpen={true}
+          onClose={handleModalClose}
+          onSuccess={handleActionSuccess}
+          queryClient={queryClient}
+          resource={ParticipantResource}
+        />
+      )}
     </div>
   );
 }
