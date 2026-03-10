@@ -23,6 +23,7 @@ function BreakfastListView() {
       resource={BreakfastResource}
       pageSize={10}
       className="breakfasts-page"
+      showPageSizeSelector={true}
     />
   );
 }

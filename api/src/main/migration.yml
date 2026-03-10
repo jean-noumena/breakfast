@@ -15,3 +15,11 @@ changesets:
           rules: rules/rules.yml
           migrations:
             - migrations/V2_email_notifications.kts
+  - name: breakfast-3.0.0
+    changes:
+      - migrate:
+          sources:
+            - npl
+          rules: rules/rules.yml
+          migrations:
+            - migrations/V3_participant_management.kts

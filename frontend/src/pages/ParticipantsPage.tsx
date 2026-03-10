@@ -40,6 +40,7 @@ function ParticipantDetailView() {
       fieldRenderers={{
         // Use PartiesDisplay component for parties field
         '@parties': (value) => <PartiesDisplay parties={value} mode="full" />,
+        'name': (value) => value.substring(0, 20) + (value.length > 20 ? '...' : ''),
       }}
       className="participants-page"
     />

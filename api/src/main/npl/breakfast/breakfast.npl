@@ -114,9 +114,13 @@ protocol[organizer, everyone, admin, emailservice] BreakfastEvent(
      * @param participant The participant protocol instance to remove
      */
     @api
-    permission[organizer] unregister(participant: Participant) | open {
+    permission[organizer | admin] unregister(participant: Participant) | open {
         var matchingReg = registrations.filter(function(r: Registration) -> r.participant == participant).firstOrNone();
-        require(matchingReg.isPresent(), "No registration found for this participant");
+        if (matchingReg.isPresent()) {
+            info("Unregistering participant: " + participant.name);
+        } else {
+            info("No registration found for participant: " + participant.name);
+        };
         registrations = registrations.without(matchingReg.getOrFail());
         participantCount = participantCount - 1;
     };
@@ -158,7 +162,15 @@ protocol[organizer, everyone, admin, emailservice] BreakfastEvent(
         organizer = randomParty;
         everyone = randomParty;
         admin = randomParty;
+        emailservice = randomParty;
         become hidden;
         return "Event is now hidden";
+    };
+
+    @api
+    permission[organizer] inviteParticipants(participants: List<Participant>) | open {
+        for (participant in participants) {
+            participant.inviteToEvent[organizer](this);
+        };
     };
 };

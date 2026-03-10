@@ -15,6 +15,11 @@ protocol[participant, everyone, admin, emailservice] Participant(
 ) {
     require(name.length() > 0, "Name cannot be empty");
 
+    /*
+    initial state active;
+    final state hidden;
+    */
+
     init {
         this.sendInitialEmail[emailservice]();
     }
@@ -39,7 +44,7 @@ protocol[participant, everyone, admin, emailservice] Participant(
      * @param newName The new name
      */
     @api
-    permission[participant] updateName(newName: Text) {
+    permission[participant | admin] updateName(newName: Text) {
         require(newName.length() > 0, "Name cannot be empty");
         name = newName;
     };
@@ -56,5 +61,48 @@ protocol[participant, everyone, admin, emailservice] Participant(
 
     permission[everyone] getEmailClaims() returns Optional<Set<Text>> {
         return participant.claims().getOrNone("email");
+    };
+
+    /*
+    @api
+    permission[admin] deleteParticipant(breakfastEvents: List<BreakfastEvent>) returns Text {
+        for (event in breakfastEvents) {
+            event.unregister[admin](this);
+        }
+        var randomClaim = "randomClaim" + now().nano().toText() + "_" + now().toText(); // Generate a random claim to obfuscate the party
+        var randomParty = partyOf(mapOf(Pair(randomClaim, setOf(randomClaim + "_value"))));
+        participant = randomParty;
+        everyone = randomParty;
+        admin = randomParty;
+        emailservice = randomParty;
+        become hidden;
+        return "Participant is now hidden";
+    };
+    */
+
+    permission[everyone] inviteToEvent(event: BreakfastEvent) {
+        this.sendInvitationEmail[emailservice](event);
+    };
+
+    permission[emailservice] sendInvitationEmail(event: BreakfastEvent) {
+        if (participant.claims().getOrNone("email").isPresent() && participant.claims().getOrNone("email").getOrFail().size() == 1) {
+            notify SendEmailNotification(
+                participant.claims().getOrNone("email").getOrFail().toList().get(0),
+                "You're invited to a Breakfast Event",
+                "Hi " + this.name + ",\n\n<br/><br/>You have been invited to the breakfast event '"
+                     + event.name + "' happening on " + printDate(event.eventDate) + ". " +
+                     "<https://public-breakfast.noumena.cloud/breakfasts/>" +
+                     "Please register for the event in the app if you would like to attend.\n\nBest regards,\nThe Breakfast Event Team"
+            ) resume participantInvitationEmailCallback;
+        };
+    }
+
+    function printDate(date: LocalDate) returns Text -> {
+        return date.dayOfWeek().toText() + " " + date.day().toText() + "." + date.month().toText() + "." + date.year().toText();
+    }
+
+    @api
+    permission[emailservice] participantInvitationEmailCallback(r: NotifyResult<SendEmailResponse>) {
+        info("Received invitation email callback for participant: " + r.toText());
     };
 };

@@ -30,6 +30,7 @@ import {
   useCreateParticipant,
   useParticipantUpdateName,
   useParticipantRegisterForEvent,
+  useParticipantUpdateParticipantEmail,
 } from '@gen/api/breakfast/default/default';
 
 // Import generated Zod schemas
@@ -83,6 +84,17 @@ const registerForEventAction: ActionDefinition<ParticipantRegisterForEventComman
   requiresConfirmation: false,
 };
 
+const updateParticipantEmailAction: ActionDefinition = {
+  name: 'updateParticipantEmail',
+  label: 'Update Participant Email',
+  variant: 'primary',
+  icon: 'file-text', // TODO: Select appropriate icon
+  mutationHook: useParticipantUpdateParticipantEmail,
+  payloadSchema: schemas.Participant_UpdateParticipantEmail_Command,
+  showPayloadForm: true,
+  requiresConfirmation: false,
+};
+
 /**
  * Participant Resource Definition
  * 
@@ -114,7 +126,7 @@ export const ParticipantResource: ResourceDefinition<
 
   // Available actions
   // SmartTable will filter these based on entity['@actions']
-  actions: [updateNameAction, registerForEventAction],
+  actions: [updateNameAction, registerForEventAction, updateParticipantEmailAction],
 
   // Table column configuration
   columns: [
@@ -127,6 +139,7 @@ export const ParticipantResource: ResourceDefinition<
     {
       key: 'name',
       label: 'Name',
+      accessor: (row) => row.name.substring(0, 20) + (row.name.length > 20 ? '...' : ''),
       render: (value) => (value as string).substring(0, 20) + ((value as string).length > 20 ? '...' : ''),
       width: '200px',
     },
@@ -134,6 +147,8 @@ export const ParticipantResource: ResourceDefinition<
 
   // Pagination configuration
   defaultPageSize: 25,
+  enableFiltering: true,  // Enable filtering for this resource
+  enableSorting: true,     // Enable sorting for this resource
 
   // Navigation menu configuration
   menu: {

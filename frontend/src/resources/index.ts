@@ -11,7 +11,7 @@
 import type { ResourceDefinition } from '@npl/frontend';
 import { registerResource } from '@npl/frontend';
 
-export { BreakfastResource } from './breakfast';
+export { BreakfastEventResource as BreakfastResource } from './breakfastEvents';
 export { ParticipantResource } from './participant';
 
 // Add more resources here as you build them:
@@ -22,16 +22,15 @@ export { ParticipantResource } from './participant';
  * All Resources Array
  * Aggregates all resource definitions for dynamic menu generation
  */
-import { BreakfastResource } from './breakfast';
+import { BreakfastEventResource } from './breakfastEvents';
 import { ParticipantResource } from './participant';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export { BreakfastEventResource } from './breakfastEvents.generated';
+
 export const ALL_RESOURCES: ResourceDefinition<any, any, any>[] = [
-  BreakfastResource,
+  BreakfastEventResource,
   ParticipantResource,
-  // Add more resources here as you build them:
-  // UserResource,
-  // ProjectResource,
 ] as const;
 
 // Auto-register all resources for reference field resolution
