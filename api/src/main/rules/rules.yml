@@ -3,18 +3,12 @@ breakfast.Participant:
     set:
       claims:
         iss:
-          # - "http://localhost:11000/realms/breakfast"
-          - "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast"
-  participant:
+          - "http://localhost:11000/realms/breakfast"
+          # - "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast"
+  admin:
     extract:
       claims:
-        - preferred_username
-        - email
-  admin:
-    set:
-      claims:
-        role:
-          - "admin"
+        - role
   emailservice:
     set:
       claims:
@@ -26,13 +20,15 @@ breakfast.BreakfastEvent:
     set:
       claims:
         iss:
-          # - "http://localhost:11000/realms/breakfast"
-          - "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast"
+          - "http://localhost:11000/realms/breakfast"
+          # - "https://keycloak-public-breakfast.noumena.cloud/realms/breakfast"
   organizer:
-    extract:
+    set:
       claims:
-        - preferred_username
-        - email
+        preferred_username:
+          - ""
+        email:
+          - ""
   admin:
     set:
       claims:

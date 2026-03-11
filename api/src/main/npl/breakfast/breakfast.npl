@@ -24,6 +24,7 @@ protocol[organizer, everyone, admin, emailservice] BreakfastEvent(
     var name: Text,
     var whatYouBring: Optional<Text>,
     var eventDate: LocalDate,
+    var organizerInstance: Participant,
 ) {
 
     initial state open;
@@ -35,6 +36,10 @@ protocol[organizer, everyone, admin, emailservice] BreakfastEvent(
     var participantCount: Number = 0;
 
     init {
+        // The organizer is pre-filled with blank values in the rules
+        // It is corrected here to match the actual organizer's claims
+        // Read from the participant protocol instance
+        organizer = partyOf(organizerInstance.getClaims[everyone]());
         this.sendCreationEmail[emailservice]();
     }
 
@@ -170,7 +175,7 @@ protocol[organizer, everyone, admin, emailservice] BreakfastEvent(
     @api
     permission[organizer] inviteParticipants(participants: List<Participant>) | open {
         for (participant in participants) {
-            participant.inviteToEvent[organizer](this);
+            participant.inviteToEvent[everyone](this);
         };
     };
 };

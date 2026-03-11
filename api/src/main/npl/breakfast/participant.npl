@@ -14,6 +14,9 @@ protocol[participant, everyone, admin, emailservice] Participant(
     var name: Text
 ) {
     require(name.length() > 0, "Name cannot be empty");
+    require(participant.claims().getOrNone("preferred_username").isPresent(), "Participant must have a preferred_username claim");
+    require(participant.claims().getOrNone("email").isPresent(), "Participant must have an email claim");
+    require(admin.claims().getOrNone("role").isPresent() && admin.claims().getOrNone("role").getOrFail().contains("admin"), "Admin must have a role claim with value 'admin'");
 
     /*
     initial state active;
@@ -61,6 +64,10 @@ protocol[participant, everyone, admin, emailservice] Participant(
 
     permission[everyone] getEmailClaims() returns Optional<Set<Text>> {
         return participant.claims().getOrNone("email");
+    };
+
+    permission[everyone] getClaims() returns Map<Text, Set<Text>> {
+        return participant.claims();
     };
 
     /*

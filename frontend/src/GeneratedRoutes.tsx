@@ -2,7 +2,7 @@
  * Generated Routes
  * 
  * Auto-generated route configuration for all resources.
- * Generated on: 2026-03-10T12:48:27.571Z
+ * Generated on: 2026-03-11T11:16:24.138Z
  * 
  * Usage in App.tsx:
  * 

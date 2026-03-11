@@ -31,6 +31,7 @@ import {
   useBreakfastEventRegister,
   useBreakfastEventGetRegistrations,
   useBreakfastEventHideEvent,
+  useBreakfastEventInviteParticipants,
 } from '@gen/api/breakfast/default/default';
 
 // Import generated Zod schemas
@@ -114,6 +115,17 @@ const hideEventAction: ActionDefinition<void, string> = {
   confirmationMessage: 'Are you sure you want to hide this event? This action cannot be undone.',
 };
 
+const inviteParticipantsAction: ActionDefinition = {
+  name: 'inviteParticipants',
+  label: 'Invite Participants',
+  variant: 'primary',
+  icon: 'file-text', // TODO: Select appropriate icon
+  mutationHook: useBreakfastEventInviteParticipants,
+  payloadSchema: schemas.BreakfastEvent_InviteParticipants_Command,
+  showPayloadForm: true,
+  requiresConfirmation: false,
+};
+
 /**
  * Breakfast Resource Definition
  * 
@@ -147,7 +159,7 @@ export const BreakfastEventResource: ResourceDefinition<
 
   // Available actions
   // SmartTable will filter these based on entity['@actions']
-  actions: [registerAction, getRegistrationsAction, hideEventAction],
+  actions: [registerAction, getRegistrationsAction, hideEventAction, inviteParticipantsAction],
 
   party: {
     organizer: {
@@ -206,7 +218,6 @@ export const BreakfastEventResource: ResourceDefinition<
         filterFn: (organizer, filterValue) => {
           const organizerClaims = (organizer as Party).claims || {};
           return Object.values(organizerClaims ?? {}).some((value) => {
-            console.log('Checking organizer value:', filterValue, ' in ', value, typeof value, typeof filterValue, value.includes(filterValue));
             return value.join(',').includes(filterValue)
           });
         },

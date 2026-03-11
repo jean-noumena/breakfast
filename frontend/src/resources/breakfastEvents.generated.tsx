@@ -2,7 +2,7 @@
  * BreakfastEvent Resource Definition
  * 
  * Auto-generated from OpenAPI spec: breakfast
- * Generated on: 2026-03-10T12:35:46.529Z
+ * Generated on: 2026-03-10T15:59:58.049Z
  * 
  * This file is generated. To customize, copy to breakfastEvents.tsx
  * and modify as needed.
@@ -29,6 +29,7 @@ import {
   useBreakfastEventGetRegistrations,
   useBreakfastEventUpdateOrganizerEmail,
   useBreakfastEventHideEvent,
+  useBreakfastEventInviteParticipants,
 } from '@gen/api/breakfast';
 import { schemas } from '@gen/zod/breakfast';
 // TODO: Optionally import icon from lucide-react
@@ -152,6 +153,17 @@ const hideEventAction: ActionDefinition = {
   requiresConfirmation: false,
 };
 
+const inviteParticipantsAction: ActionDefinition = {
+  name: 'inviteParticipants',
+  label: 'Invite Participants',
+  variant: 'primary',
+  icon: 'file-text', // TODO: Select appropriate icon
+  mutationHook: useBreakfastEventInviteParticipants,
+  payloadSchema: schemas.BreakfastEvent_InviteParticipants_Command,
+  showPayloadForm: true,
+  requiresConfirmation: false,
+};
+
 
 // Resource definition
 export const BreakfastEventResource: ResourceDefinition<BreakfastEvent, GetBreakfastEventListParams, BreakfastEventCreate> = {
@@ -170,7 +182,7 @@ export const BreakfastEventResource: ResourceDefinition<BreakfastEvent, GetBreak
   createSchema: schemas.BreakfastEvent_Create,
   
   // Actions
-  actions: [organizerCreationEmailCallbackAction, updateEventDetailsAction, registerAction, participantEmailCallbackAction, organizerEmailCallbackAction, unregisterAction, completeAction, cancelAction, getRegistrationsAction, updateOrganizerEmailAction, hideEventAction],
+  actions: [organizerCreationEmailCallbackAction, updateEventDetailsAction, registerAction, participantEmailCallbackAction, organizerEmailCallbackAction, unregisterAction, completeAction, cancelAction, getRegistrationsAction, updateOrganizerEmailAction, hideEventAction, inviteParticipantsAction],
   showActionsInListView: true,
   
   // Table columns

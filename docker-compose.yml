@@ -25,11 +25,18 @@ services:
       SWAGGER_SECURITY_CLIENT_SECRET:
       ENGINE_MANAGEMENT_HOST: 0.0.0.0
       ENGINE_MANAGEMENT_PORT: 12400
+      ENGINE_NPL_MIGRATION_DIRECTORY_PATH: /npl
+    volumes:
+      - ./api/src/main/migration.yml:/npl/migration.yml:ro
+      - ./api/src/main/migrations:/npl/migrations:ro
+      - ./api/src/main/npl:/npl/npl:ro
+      - ./api/src/main/rules:/npl/rules:ro
     depends_on:
       engine-db:
         condition: service_started
       keycloak:
         condition: service_healthy
+
   nginx-proxy:
     image: nginx:latest
     ports:
@@ -112,6 +119,16 @@ services:
       KC_DB_USERNAME: postgres
       KC_DB_PASSWORD: testing
       KC_HEALTH_ENABLED: "true"
+      # --- SPI CONFIGURATION ---
+      # Keycloak translates KC_SPI_<SPI_TYPE>_<PROVIDER_ID>_<PROPERTY> into SPI configs
+      KC_SPI_EVENTS_LISTENER_NPL_ENGINE_LISTENER_NPL_URL: http://engine:12000
+      KC_SPI_EVENTS_LISTENER_NPL_ENGINE_LISTENER_CLIENT_ID: keycloak-listener
+      KC_SPI_EVENTS_LISTENER_NPL_ENGINE_LISTENER_CLIENT_SECRET: Welcome123!
+      # The token URL usually looks like this:
+      KC_SPI_EVENTS_LISTENER_NPL_ENGINE_LISTENER_TOKEN_URL: http://keycloak:11000/realms/breakfast/protocol/openid-connect/token
+    volumes:
+      # Mount your locally compiled JAR file directly into the providers directory
+      - ./target/npl-event-listener.jar:/opt/keycloak/providers/npl-event-listener.jar
     depends_on:
       keycloak-db:
         condition: service_started

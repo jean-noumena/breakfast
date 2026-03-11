@@ -71,3 +71,25 @@ resource "keycloak_openid_client" "client" {
   web_origins                     = var.web_origins
   root_url                        = var.root_url
 }
+
+resource "keycloak_openid_client" "listener" {
+  realm_id                     = keycloak_realm.realm.id
+  client_id                    = "keycloak-listener"
+  access_type                  = "CONFIDENTIAL"
+  client_secret                = "Welcome123!"
+  direct_access_grants_enabled = true
+  service_accounts_enabled     = true
+  standard_flow_enabled        = false
+}
+
+resource "keycloak_openid_hardcoded_claim_protocol_mapper" "listener_role_mapper" {
+  realm_id    = keycloak_realm.realm.id
+  client_id   = keycloak_openid_client.listener.id
+  name        = "role-mapper"
+  claim_name  = "role"
+  claim_value = jsonencode(["admin"])
+  claim_value_type = "JSON"
+  add_to_id_token = true
+  add_to_access_token = true
+  add_to_userinfo = true
+}
